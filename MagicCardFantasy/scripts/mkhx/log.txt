@@ -1,0 +1,152 @@
+[game] start
+
+[game] round 1 start
+[round] hero[a]
+[hero][a] put card[火灵操控者7] to hand
+
+[game] round 2 start
+[round] hero[b]
+[hero][b] put card[堕落精灵10] to hand
+
+[game] round 3 start
+[round] hero[a]
+[hero][a] put card[堕落精灵5] to hand
+
+[game] round 4 start
+[round] hero[b]
+[hero][b] put card[堕落精灵10] to hand
+[hero][b] put card[堕落精灵10] to field
+[skill][背刺] atk 455 --> 575
+[hero][a] 1700 - 575 = 1125
+
+[game] round 5 start
+[round] hero[a]
+[hero][a] put card[魔法协会长9] to hand
+[hero][a] put card[火灵操控者7] to field
+[hero][a] put card[堕落精灵5] to field
+[skill][火球4] fire damage 122 --> [card][堕落精灵10]
+[card][堕落精灵10] 670-122=548
+[card][火灵操控者7] attack [堕落精灵10]
+[card][堕落精灵10] 548-353=195
+[skill][背刺] atk 310 --> 430
+[hero][b] 1560 - 430 = 1130
+
+[game] round 6 start
+[round] hero[b]
+[hero][b] put card[火灵操控者10] to hand
+[hero][b] put card[堕落精灵10] to field
+[skill][暴击] atk 455 --> 1092
+[card][堕落精灵10] attack [火灵操控者7]
+[card][火灵操控者7] 1195-1092=103
+[skill][背刺] atk 455 --> 575
+[card][堕落精灵10] attack [堕落精灵5]
+[skill][闪避3] 575 --> 0
+[card][堕落精灵5] 630-0=630
+
+[game] round 7 start
+[round] hero[a]
+[hero][a] put card[魔法协会长3] to hand
+[skill][火球4] fire damage 157 --> [card][堕落精灵10]
+[card][堕落精灵10] 195-157=38
+[card][火灵操控者7] attack [堕落精灵10]
+[card][堕落精灵10] 38-353=-315
+[hero][b] put card[堕落精灵10] to grave
+[card][堕落精灵5] attack [堕落精灵10]
+[skill][闪避3] 310 --> 0
+[card][堕落精灵10] 670-0=670
+
+[game] round 8 start
+[round] hero[b]
+[card][堕落精灵10] attack [火灵操控者7]
+[card][火灵操控者7] 103-455=-352
+[hero][a] put card[火灵操控者7] to grave
+
+[game] round 9 start
+[round] hero[a]
+[hero][a] put card[堕落精灵1] to hand
+[card][堕落精灵5] attack [堕落精灵10]
+[card][堕落精灵10] 670-310=360
+
+[game] round 10 start
+[round] hero[b]
+[hero][b] put card[火灵操控者10] to field
+[skill][暴击] atk 455 --> 1092
+[card][堕落精灵10] attack [堕落精灵5]
+[card][堕落精灵5] 630-1092=-462
+[hero][a] put card[堕落精灵5] to grave
+[hero][a] 1125 - 410 = 715
+
+[game] round 11 start
+[round] hero[a]
+[hero][a] put card[魔法协会长9] to field
+[hero][a] put card[堕落精灵1] to field
+[skill][火墙5] fire damage 206 --> [card][堕落精灵10]
+[card][堕落精灵10] 360-206=154
+[skill][火墙5] fire damage 226 --> [card][火灵操控者10]
+[card][火灵操控者10] 1360-226=1134
+[card][魔法协会长9] attack [堕落精灵10]
+[skill][闪避3] 426 --> 0
+[card][堕落精灵10] 154-0=154
+[card][堕落精灵1] attack [火灵操控者10]
+[card][火灵操控者10] 1134-194=940
+
+[game] round 12 start
+[round] hero[b]
+[card][堕落精灵10] attack [魔法协会长9]
+[card][魔法协会长9] 1123-455=668
+[skill][火球4] fire damage 116 --> [card][堕落精灵1]
+[card][堕落精灵1] 598-116=482
+[skill][烈焰风暴7] fire damage 339 --> [card][魔法协会长9]
+[card][魔法协会长9] 668-339=329
+[skill][烈焰风暴7] fire damage 236 --> [card][堕落精灵1]
+[card][堕落精灵1] 482-236=246
+[card][火灵操控者10] attack [堕落精灵1]
+[skill][闪避3] 410 --> 0
+[card][堕落精灵1] 246-0=246
+
+[game] round 13 start
+[round] hero[a]
+[hero][a] put card[魔法协会长3] to field
+[skill][火墙5] fire damage 249 --> [card][堕落精灵10]
+[card][堕落精灵10] 154-249=-95
+[hero][b] put card[堕落精灵10] to grave
+[skill][火墙5] fire damage 214 --> [card][火灵操控者10]
+[card][火灵操控者10] 940-214=726
+[card][魔法协会长9] attack [堕落精灵10]
+[skill][闪避3] 426 --> 0
+[card][堕落精灵10] -95-0=-95
+[card][堕落精灵1] attack [火灵操控者10]
+[card][火灵操控者10] 726-194=532
+[hero][b] 1130 - 282 = 848
+
+[game] round 14 start
+[round] hero[b]
+[skill][火球4] fire damage 149 --> [card][魔法协会长9]
+[card][魔法协会长9] 329-149=180
+[skill][烈焰风暴7] fire damage 260 --> [card][魔法协会长9]
+[card][魔法协会长9] 180-260=-80
+[hero][a] put card[魔法协会长9] to grave
+[skill][烈焰风暴7] fire damage 321 --> [card][堕落精灵1]
+[card][堕落精灵1] 246-321=-75
+[hero][a] put card[堕落精灵1] to grave
+[skill][烈焰风暴7] fire damage 263 --> [card][魔法协会长3]
+[card][魔法协会长3] 901-263=638
+[card][火灵操控者10] attack [魔法协会长9]
+[card][魔法协会长9] -80-410=-490
+
+[game] round 15 start
+[round] hero[a]
+[card][魔法协会长3] attack [火灵操控者10]
+[card][火灵操控者10] 532-282=250
+
+[game] round 16 start
+[round] hero[b]
+[skill][火球4] fire damage 115 --> [card][魔法协会长3]
+[card][魔法协会长3] 638-115=523
+[skill][烈焰风暴7] fire damage 285 --> [card][魔法协会长3]
+[card][魔法协会长3] 523-285=238
+[card][火灵操控者10] attack [魔法协会长3]
+[card][魔法协会长3] 238-410=-172
+[hero][a] put card[魔法协会长3] to grave
+[game] hero[a] fail...
+[game] end
