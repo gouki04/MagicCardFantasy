@@ -1,0 +1,3 @@
+local CURRENT_MODULE_NAME = ...
+
+return require 'test.test2'
