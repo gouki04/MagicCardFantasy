@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+  <command>D:\GitHub\MagicCardFantasy\player\quick-x-player.exe</command>
+  <working_directory>D:\GitHub\MagicCardFantasy\MagicCardFantasy</working_directory>
+  <symbols_directory></symbols_directory>
+  <command_arguments>-workdir "D:\\GitHub\\MagicCardFantasy\\MagicCardFantasy\\" -disable-load-framework</command_arguments>
+  <scc>
+    <provider></provider>
+    <user></user>
+    <project_name></project_name>
+    <local_path></local_path>
+    <aux_project_path></aux_project_path>
+  </scc>
+</project>
