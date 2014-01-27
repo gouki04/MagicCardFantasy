@@ -1,8 +1,7 @@
 --[[
 	@brief scripts/view/handCard.lua
 ]]
-require 'utility/class'
-require 'utility/delegate'
+require 'utility.delegate'
 
 HandCard_view = class()
 

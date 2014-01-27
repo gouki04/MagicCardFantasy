@@ -85,7 +85,7 @@ local function getCardInfo(id)
 	return m_cards[id]
 end
 
-CardDefine = {
+local CardDefine = {
 	getCardInfo = getCardInfo,
 }
 

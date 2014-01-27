@@ -1,7 +1,7 @@
 --[[
 	@brief scripts/model/skill/skill_ge_dang.lua
 ]]
-require 'scripts/model/skill/skill'
+import '.skill'
 
 Skill_ge_dang = class(Skill)
 

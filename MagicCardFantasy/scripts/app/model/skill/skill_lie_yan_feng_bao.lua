@@ -1,7 +1,7 @@
 --[[
 	@brief scripts/model/skill/skill_lie_yan_feng_bao.lua
 ]]
-require 'scripts/model/skill/skill'
+import '.skill'
 
 Skill_lie_yan_feng_bao = class(Skill)
 

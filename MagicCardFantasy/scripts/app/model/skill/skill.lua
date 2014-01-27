@@ -1,10 +1,9 @@
 --[[
 	@brief scripts/model/skill/skill.lua
 ]]
-require 'utility/class'
-require 'utility/delegate'
+require 'utility.delegate'
 
-Skill = class()
+local Skill = class('Skill')
 
 function Skill:ctor()
 end
@@ -39,3 +38,5 @@ end
 function Skill:id()
 	return self.m_id
 end
+
+return Skill

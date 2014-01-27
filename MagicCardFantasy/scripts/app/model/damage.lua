@@ -1,13 +1,14 @@
 --[[
 	@brief scripts/model/damage.lua
 ]]
-require 'utility/class'
-require 'utility/delegate'
+require 'utility.delegate'
 
-Damage = class()
+local Damage = class('Damage')
 
-DamageType_Physical = 1
-DamageType_Magical = 2
+Damage.eType = {
+	Physical = 1,
+	Magical = 2,
+}
 
 function Damage:ctor(type, value, card)
 	self.m_type = type
@@ -36,3 +37,5 @@ end
 function Damage:type()
 	return self.m_type
 end
+
+return Damage

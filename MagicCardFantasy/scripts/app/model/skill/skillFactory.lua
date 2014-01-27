@@ -1,8 +1,7 @@
 --[[
 	@brief skill/skillFactory.lua
 ]]
-require 'utility/class'
-require 'utility/delegate'
+require 'utility.delegate'
 
 local m_skillDefine = {}
 
@@ -43,6 +42,8 @@ local function createSkillById(id, lv)
 	return skill
 end
 
-SkillFactory = {
+local SkillFactory = {
 	createSkillById = createSkillById,
 }
+
+return SkillFactory

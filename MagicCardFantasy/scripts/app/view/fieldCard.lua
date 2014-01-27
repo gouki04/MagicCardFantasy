@@ -1,8 +1,7 @@
 --[[
 	@brief scripts/view/fieldCard.lua
 ]]
-require 'utility/class'
-require 'utility/delegate'
+require 'utility.delegate'
 
 FieldCard_view = class()
 

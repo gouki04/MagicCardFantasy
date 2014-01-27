@@ -1,8 +1,8 @@
 --[[
 	@brief scripts/model/round.lua
 ]]
-require 'scripts/model/hero/hero'
-require 'scripts/model/card/card'
+import '.hero.hero'
+import '.card.card'
 
 local function handCardBattle(acard, dcard)
 	acard:attackCard(dcard)
@@ -114,6 +114,8 @@ local function start(attack, defend)
 	end
 end
 
-Round = {
+local Round = {
 	start = start,
 }
+
+return Round
