@@ -2,30 +2,28 @@
 	@brief log.lua
 ]]
 
-local m_logFile = nil
-local m_logFileName = 'log.txt'
+local logFile_ = nil
+local logFileName_ = 'log.txt'
 
-local function init()
-	m_logFile = io.open(m_logFileName, 'w+')
+local Log = class('Log')
+
+function Log.init()
+	logFile_ = io.open(logFileName_, 'w+')
 end
 
-local function destroy()
-	if m_logFile then
-		m_logFile:close()
-		m_logFile = nil
+function Log.destroy()
+	if logFile_ then
+		logFile_:close()
+		logFile_ = nil
 	end
 end
 
-local function write(...)
-	if m_logFile then
-		m_logFile:write(...)
-		m_logFile:write('\n')
-		m_logFile:flush()
+function Log.write(...)
+	if logFile_ then
+		logFile_:write(...)
+		logFile_:write('\n')
+		logFile_:flush()
 	end
 end
 
-Log = {
-	init = init,
-	destroy = destroy,
-	write = write,
-}
+return Log

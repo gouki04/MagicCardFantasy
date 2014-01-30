@@ -1,8 +1,7 @@
 --[[
 	@brief scripts/model/round.lua
 ]]
-import '.hero.hero'
-import '.card.card'
+local Log   = require 'log'
 
 local function handCardBattle(acard, dcard)
 	acard:attackCard(dcard)
