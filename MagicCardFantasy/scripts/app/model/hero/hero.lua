@@ -3,12 +3,20 @@
 ]]
 local Log = require 'log'
 
-local Card  = import '..card.card'
+local Card       = import '..card.card'
+local HandCard   = import '..card.handCard'
+local DeckCard   = import '..card.deckCard'
+local FieldCard  = import '..card.fieldCard'
+local GraveCard  = import '..card.graveCard'
 
 local Hero = class('Hero', cc.mvc.ModelBase)
 
 -- 定义事件
-Hero.DIED_EVENT = "DIED_EVENT"
+Hero.DIED_EVENT        = "DIED_EVENT"
+Hero.ADD_CARD_TO_DECK  = "ADD_CARD_TO_DECK"
+Hero.ADD_CARD_TO_HAND  = "ADD_CARD_TO_HAND"
+Hero.ADD_CARD_TO_FIELD = "ADD_CARD_TO_FIELD"
+Hero.ADD_CARD_TO_GRAVE = "ADD_CARD_TO_GRAVE"
 
 -- 定义属性
 Hero.schema = {}
@@ -48,33 +56,58 @@ function Hero:notifyCardDied(evt)
 end
 
 function Hero:addCardToDeck(id, lv)
-	local card = {id = id, lv = lv}
+	local card = DeckCard.new({id = id, lv = lv})
 	table.insert(self.deck_, card)
+
+	card:toDeck(self)
+	self:dispatchEvent({name = Hero.ADD_CARD_TO_DECK, hero = self, card = card})
 end
 
 function Hero:addCardToHand(deck_card)
-	local hand_card = Card.new()
-	hand_card:init(deck_card.id, deck_card.lv)
+	local hand_card = HandCard.new({
+			id = deck_card:id(),
+			lv = deck_card:lv(),
+		})
+
 	table.insert(self.hand_, hand_card)
+
+	hand_card:toHand(self)
+	self:dispatchEvent({name = Hero.ADD_CARD_TO_HAND, hero = self, card = hand_card})
 
 	Log.write(string.format('[hero][%s] put card[%s%i] to hand', 
 		self:name(), hand_card:name(), hand_card:lv()))
 end
 
 function Hero:addCardToField(hand_card)
-	table.insert(self.field_, hand_card)
+	local field_card = FieldCard.new({
+			id = hand_card:id(),
+			lv = hand_card:lv(),
+		})
 
-	hand_card:addEventListener(Card.DIED_EVENT, self.notifyCardDied, self)
+	table.insert(self.field_, field_card)
+
+	field_card:addEventListener(Card.DIED_EVENT, self.notifyCardDied, self)
+
+	field_card:toField(self)
+	self:dispatchEvent({name = Hero.ADD_CARD_TO_FIELD, hero = self, card = field_card})
 
 	Log.write(string.format('[hero][%s] put card[%s%i] to field', 
-		self:name(), hand_card:name(), hand_card:lv()))
+		self:name(), field_card:name(), field_card:lv()))
 end
 
 function Hero:addCardToGrave(field_card)
-	table.insert(self.grave_, {id = field_card:id(), lv = field_card:lv()})
+	local grave_card = GraveCard.new({
+			id = field_card:id(),
+			lv = field_card:lv(),
+		})
+
+	table.insert(self.grave_, grave_card)
+
+	grave_card:toGrave(self)
+	self:dispatchEvent({name = Hero.ADD_CARD_TO_GRAVE, hero = self, card = grave_card})
 
 	Log.write(string.format('[hero][%s] put card[%s%i] to grave', 
-		self:name(), field_card:name(), field_card:lv()))
+		self:name(), grave_card:name(), grave_card:lv()))
 end
 
 function Hero:name()

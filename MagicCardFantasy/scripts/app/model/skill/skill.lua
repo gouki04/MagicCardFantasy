@@ -38,4 +38,16 @@ function Skill:id()
 	return self.id_
 end
 
+function Skill:toDeck(hero, card)
+end
+
+function Skill:toHand(hero, card)
+end
+
+function Skill:toField(hero, card)
+end
+
+function Skill:toGrave(hero, card)
+end
+
 return Skill
