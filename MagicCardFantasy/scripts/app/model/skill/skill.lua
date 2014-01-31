@@ -3,18 +3,19 @@
 ]]
 require 'utility.delegate'
 
-local Skill = class('Skill')
+local Skill = class('Skill', cc.mvc.ModelBase)
 
-function Skill:ctor()
+function Skill:ctor(properties)
+	Skill.super.ctor(self, properties)
 end
 
 function Skill:init(id, lv)
-	self.m_id = id
-	self.m_lv= lv
+	self.id_ = id
+	self.lv_= lv
 end
 
 function Skill:name()
-	return self.m_name
+	return self.name_
 end
 
 function Skill:enter()
@@ -24,19 +25,19 @@ function Skill:leave()
 end
 
 function Skill:setCard(card)
-	self.m_card = card
+	self.card_ = card
 end
 
 function Skill:card()
-	return self.m_card
+	return self.card_
 end
 
 function Skill:lv()
-	return self.m_lv
+	return self.lv_
 end
 
 function Skill:id()
-	return self.m_id
+	return self.id_
 end
 
 return Skill

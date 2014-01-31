@@ -2,6 +2,7 @@
 	@brief scripts/model/card/card.lua
 ]]
 require 'utility.delegate'
+local Log = require 'log'
 
 local CardDefine   = import '.cardDefine'
 local Damage       = import '..damage'
@@ -151,7 +152,7 @@ function Card:attackCard(card)
 
 	local dam = Damage:new()
 	dam:init(Damage.eType.Physical, self:atk(), self)
-	Game.log(string.format('[card][%s%i] attack [%s%i]', 
+	Log.write(string.format('[card][%s%i] attack [%s%i]', 
 		self:name(), self:lv(), card:name(), card:lv()))
 	
 	dam = card:damage(dam)
@@ -185,7 +186,7 @@ function Card:damage(dam)
 	local msg = string.format('[card][%s%i] %i-%i=%i', 
 		self:name(), self:lv(), self:hp(), dam:value(), new_hp)
 
-	Game.log(msg)
+	Log.write(msg)
 
 	self:setHp(new_hp)
 

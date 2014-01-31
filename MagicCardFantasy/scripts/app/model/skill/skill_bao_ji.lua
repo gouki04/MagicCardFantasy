@@ -1,12 +1,14 @@
 --[[
 	@brief scripts/model/skill/skill_bao_ji.lua
 ]]
-import '.skill'
+local Log = require 'log'
 
-Skill_bao_ji = class(Skill)
+local Skill = import '.skill'
+
+Skill_bao_ji = class('Skill_bao_ji', Skill)
 
 function Skill_bao_ji:ctor()
-	self.m_name = '暴击'
+	self.name_ = '暴击'
 end
 
 function Skill_bao_ji:enter(defend, dcard)
@@ -16,19 +18,19 @@ function Skill_bao_ji:enter(defend, dcard)
 
 	local rate = 0.5
 	if math.random(0, 1) < rate then
-		local oldAtk = self.m_card:atk()
-		self.m_additionAtk = self.m_card:baseAtk() * (0.2 * self.m_lv)
-		self.m_card:addAdditionAtk(self.m_additionAtk)
+		local oldAtk = self.card_:atk()
+		self.additionAtk_ = self.card_:baseAtk() * (0.2 * self.lv_)
+		self.card_:addAdditionAtk(self.additionAtk_)
 
-		Game.log(string.format('[skill][%s] atk %i --> %i', self.m_name, oldAtk, self.m_card:atk()))	
+		Log.write(string.format('[skill][%s] atk %i --> %i', self.name_, oldAtk, self.card_:atk()))	
 	end
 end
 
 function Skill_bao_ji:leave()
-	if self.m_additionAtk ~= nil and self.m_additionAtk > 0 then
-		self.m_card:addAdditionAtk(-self.m_additionAtk)
+	if self.additionAtk_ ~= nil and self.additionAtk_ > 0 then
+		self.card_:addAdditionAtk(-self.additionAtk_)
 
-		self.m_additionAtk = nil
+		self.additionAtk_ = nil
 	end
 end
 

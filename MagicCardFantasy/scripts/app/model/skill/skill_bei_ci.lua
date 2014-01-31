@@ -1,32 +1,34 @@
 --[[
 	@brief scripts/model/skill/skill_bei_ci.lua
 ]]
-import '.skill'
+local Log = require 'log'
 
-Skill_bei_ci = class(Skill)
+local Skill = import '.skill'
+
+Skill_bei_ci = class('Skill_bei_ci', Skill)
 
 function Skill_bei_ci:ctor()
-	self.m_name = '背刺'
-	self.m_first = true
+	self.name_ = '背刺'
+	self.first_ = true
 end
 
 function Skill_bei_ci:enter(defend, dcard)
-	if self.m_first then
-		local oldAtk = self.m_card:atk()
-		self.m_additionAtk = 40 * self.m_lv
-		self.m_card:addAdditionAtk(self.m_additionAtk)
+	if self.first_ then
+		local oldAtk = self.card_:atk()
+		self.additionAtk_ = 40 * self.lv_
+		self.card_:addAdditionAtk(self.additionAtk_)
 
-		Game.log(string.format('[skill][%s] atk %i --> %i', self.m_name, oldAtk, self.m_card:atk()))
+		Log.write(string.format('[skill][%s] atk %i --> %i', self.name_, oldAtk, self.card_:atk()))
 		
-		self.m_first = false
+		self.first_ = false
 	end
 end
 
 function Skill_bei_ci:leave()
-	if self.m_additionAtk ~= nil and self.m_additionAtk > 0 then
-		self.m_card:addAdditionAtk(-self.m_additionAtk)
+	if self.additionAtk_ ~= nil and self.additionAtk_ > 0 then
+		self.card_:addAdditionAtk(-self.additionAtk_)
 
-		self.m_additionAtk = nil
+		self.additionAtk_ = nil
 	end
 end
 

@@ -1,12 +1,15 @@
 --[[
 	@brief scripts/model/skill/skill_huo_qiu.lua
 ]]
-import '.skill'
+local Log = require 'log'
 
-Skill_huo_qiu = class(Skill)
+local Damage = import '..damage'
+local Skill  = import '.skill'
+
+Skill_huo_qiu = class('Skill_huo_qiu', Skill)
 
 function Skill_huo_qiu:ctor()
-	self.m_name = '火球'
+	self.name_ = '火球'
 end
 
 function Skill_huo_qiu:enter(defend, dcard)
@@ -30,14 +33,14 @@ function Skill_huo_qiu:enter(defend, dcard)
 	end
 
 	if selectCard then
-		local dam = Damage:new()
+		local dam = Damage.new()
 		
-		local min = self.m_lv * 25
-		local max = self.m_lv * 50
+		local min = self.lv_ * 25
+		local max = self.lv_ * 50
 		local value = math.floor(math.random(min, max))
 
-		dam:init(DamageType_Magical, value, self.m_card)
-		Game.log(string.format('[skill][%s%i] fire damage %i --> [card][%s%i]', 
+		dam:init(Damage.eType.Magical, value, self.card_)
+		Log.write(string.format('[skill][%s%i] fire damage %i --> [card][%s%i]', 
 			self:name(), self:lv(), value, selectCard:name(), selectCard:lv()))
 
 		selectCard:damage(dam)

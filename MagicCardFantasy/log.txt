@@ -1,2 +1,66 @@
 [game] start
+[round] hero[a]
+[hero][a] put card[魔法协会长9] to hand
+
+[game] round 1 start
+[round] hero[b]
+[hero][b] put card[火灵操控者10] to hand
+
+[game] round 2 start
+[round] hero[a]
+[hero][a] put card[堕落精灵5] to hand
+
+[game] round 3 start
+[round] hero[b]
+[hero][b] put card[堕落精灵10] to hand
+
+[game] round 4 start
+[round] hero[a]
+[hero][a] put card[魔法协会长3] to hand
+[hero][a] put card[堕落精灵5] to field
+[skill][背刺] atk 310 --> 430
+[hero][b] 1070 - 430 = 640
+
+[game] round 5 start
+[round] hero[b]
+[hero][b] put card[堕落精灵10] to hand
+[hero][b] put card[火灵操控者10] to field
+[hero][b] put card[堕落精灵10] to field
+[skill][火球4] fire damage 146 --> [card][堕落精灵5]
+[card][堕落精灵5] 630-146=484
+[skill][烈焰风暴7] fire damage 315 --> [card][堕落精灵5]
+[card][堕落精灵5] 484-315=169
+[card][火灵操控者10] attack [堕落精灵5]
+[card][堕落精灵5] 169-410=-241
+[hero][a] put card[堕落精灵5] to grave
+[skill][背刺] atk 455 --> 575
+[hero][a] 1070 - 575 = 495
+
+[game] round 6 start
+[round] hero[a]
+[hero][a] put card[火灵操控者7] to hand
+[hero][a] put card[魔法协会长9] to field
+[skill][火墙5] fire damage 241 --> [card][火灵操控者10]
+[card][火灵操控者10] 1360-241=1119
+[skill][火墙5] fire damage 146 --> [card][堕落精灵10]
+[card][堕落精灵10] 670-146=524
+[card][魔法协会长9] attack [火灵操控者10]
+[card][火灵操控者10] 1119-426=693
+
+[game] round 7 start
+[round] hero[b]
+[hero][b] put card[堕落精灵10] to field
+[skill][火球4] fire damage 122 --> [card][魔法协会长9]
+[card][魔法协会长9] 1123-122=1001
+[skill][烈焰风暴7] fire damage 187 --> [card][魔法协会长9]
+[card][魔法协会长9] 1001-187=814
+[card][火灵操控者10] attack [魔法协会长9]
+[card][魔法协会长9] 814-410=404
+[hero][a] 495 - 455 = 40
+[skill][背刺] atk 455 --> 575
+[hero][a] 40 - 575 = -535
+hero[a] died..
+[game] hero[a] fail...
+
+[game] round 8 start
 [game] end

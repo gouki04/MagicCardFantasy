@@ -14,17 +14,20 @@ function Game:ctor(properties)
 	Game.super.ctor(self, properties)
 
 	self.end_ = false
-	self.round_ = 1
+	self.round_ = Round.new()
 	self.hero1_ = nil
 	self.hero2_ = nil
+	self.attack_ = nil
+	self.defend_ = nil
 end
 
-function Game:notifyHeroDied(hero)
-	Log.write('[game] hero['..hero:name()..'] fail...')
+function Game:notifyHeroDied(evt)
+	Log.write('[game] hero['..evt.hero:name()..'] fail...')
 	self.end_ = true
 end
 
 function Game:start(hero1, hero2)
+	Log.init()
 	Log.write('[game] start')
 
 	math.randomseed(os.time())
@@ -32,34 +35,33 @@ function Game:start(hero1, hero2)
 	self.hero1_ = hero1
 	self.hero2_ = hero2
 
-	self.hero1_.eventDied:regist(notifyHeroDied)
-	self.hero2_.eventDied:regist(notifyHeroDied)
+	self.hero1_:addEventListener(Hero.DIED_EVENT, self.notifyHeroDied, self)
+	self.hero2_:addEventListener(Hero.DIED_EVENT, self.notifyHeroDied, self)
 
-	self.round_ = 1
 	local side = 1
-	while self.round_ < 30 and not self.end_ do
+	while self.round_:count() < 30 and not self.end_ do
 		if side == 1 then
-			attack = hero1
-			defend = hero2
+			self.attack_ = hero1
+			self.defend_ = hero2
 			side = 0
 		else
-			attack = hero2
-			defend = hero1
+			self.attack_ = hero2
+			self.defend_ = hero1
 			side = 1
 		end
 
-		if #attack:deck() <= 0 and #attack:hand() <= 0 and table.empty(attack:field()) then
-			Log.write('[game] hero['..attack:name()..'] fail...')
+		if #self.attack_:deck() <= 0 and #self.attack_:hand() <= 0 and table.empty(self.attack_:field()) then
+			Log.write('[game] hero['..self.attack_:name()..'] fail...')
 			break
 		end
 
-		Log.write('\n[game] round '..self.round_..' start')
+		self.round_:start(self.attack_, self.defend_)
 
-		Round.start(attack, defend)
-		self.round_ = self.round_ + 1
+		Log.write('\n[game] round '..self.round_:count()..' start')
 	end
 
 	Log.write('[game] end')
+	Log.destroy()
 end
 
 return Game

@@ -1,14 +1,26 @@
 --[[
 	@brief scripts/model/round.lua
 ]]
-local Log   = require 'log'
+local Log = require 'log'
 
-local function handCardBattle(acard, dcard)
+local Round = class('Round', cc.mvc.ModelBase)
+
+function Round:ctor()
+	self.roundCnt_ = 0
+end
+
+function Round:count()
+	return self.roundCnt_
+end
+
+function Round:handCardBattle(acard, dcard)
 	acard:attackCard(dcard)
 end
 
-local function start(attack, defend)
-	Game.log('[round] hero['..attack:name()..']')
+function Round:start(attack, defend)
+	self.roundCnt_ = self.roundCnt_ + 1
+
+	Log.write('[round] hero['..attack:name()..']')
 
 	-- 移牌
 	local field = attack:field()
@@ -105,16 +117,12 @@ local function start(attack, defend)
 				defend:damage(acard:atk())
 			else
 				-- attack to card
-				handCardBattle(acard, dcard)
+				self:handCardBattle(acard, dcard)
 			end
 
 			acard:leave()
 		end
 	end
 end
-
-local Round = {
-	start = start,
-}
 
 return Round

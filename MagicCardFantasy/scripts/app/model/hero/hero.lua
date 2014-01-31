@@ -3,7 +3,9 @@
 ]]
 
 require 'utility.delegate'
-local Game = import '..model.game'
+local Log = require 'log'
+
+local Card  = import '..card.card'
 
 local Hero = class('Hero', cc.mvc.ModelBase)
 
@@ -35,7 +37,9 @@ function Hero:init(lv, name)
 	self.hp_ = 1000 + lv * 70
 end
 
-function Hero:notifyCardDied(card)
+function Hero:notifyCardDied(evt)
+	local card = evt.card
+	
 	local field = self:field()
 	for i = 1, #field do
 		if field[i] == card then
@@ -51,11 +55,11 @@ function Hero:addCardToDeck(id, lv)
 end
 
 function Hero:addCardToHand(deck_card)
-	local hand_card = Card:new()
+	local hand_card = Card.new()
 	hand_card:init(deck_card.id, deck_card.lv)
 	table.insert(self.hand_, hand_card)
 
-	Game:log(string.format('[hero][%s] put card[%s%i] to hand', 
+	Log.write(string.format('[hero][%s] put card[%s%i] to hand', 
 		self:name(), hand_card:name(), hand_card:lv()))
 end
 
@@ -64,14 +68,14 @@ function Hero:addCardToField(hand_card)
 
 	hand_card:addEventListener(Card.DIED_EVENT, self.notifyCardDied, self)
 
-	Game:log(string.format('[hero][%s] put card[%s%i] to field', 
+	Log.write(string.format('[hero][%s] put card[%s%i] to field', 
 		self:name(), hand_card:name(), hand_card:lv()))
 end
 
 function Hero:addCardToGrave(field_card)
 	table.insert(self.grave_, {id = field_card:id(), lv = field_card:lv()})
 
-	Game:log(string.format('[hero][%s] put card[%s%i] to grave', 
+	Log.write(string.format('[hero][%s] put card[%s%i] to grave', 
 		self:name(), field_card:name(), field_card:lv()))
 end
 
@@ -103,7 +107,7 @@ function Hero:setHp(hp)
 	self.hp_ = hp
 
 	if self.hp_ <= 0 then
-		Game:log('hero['..self.name_..'] died..')
+		Log.write('hero['..self.name_..'] died..')
 		self:dispatchEvent({name = Hero.DIED_EVENT, hero = self})
 	end
 end
@@ -113,7 +117,7 @@ function Hero:hp()
 end
 
 function Hero:damage(dam)
-	Game:log('[hero]['..self.name_..'] '..self.hp_..' - '..dam.. ' = '..self.hp_ - dam)
+	Log.write('[hero]['..self.name_..'] '..self.hp_..' - '..dam.. ' = '..self.hp_ - dam)
 	self:setHp(self.hp_ - dam)
 	return dam
 end

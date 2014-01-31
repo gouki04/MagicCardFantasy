@@ -1,32 +1,39 @@
 --[[
 	@brief scripts/model/skill/skill_ge_dang.lua
 ]]
-import '.skill'
+local Log = require 'log'
 
-Skill_ge_dang = class(Skill)
+local Card   = import '..card.card'
+local Damage = import '..damage'
+local Skill  = import '.skill'
+
+Skill_ge_dang = class('Skill_ge_dang', Skill)
 
 function Skill_ge_dang:ctor()
-	self.m_name = '格挡'
+	self.name_ = '格挡'
+end
 
-	self.m_onBeforePhysicalDamage = function(card, dam)
-		if dam:type() == DamageType_Physical then
-			local value = dam:value() - 20 * self:lv()
-			if value < 0 then
-				value = 0
-			end
+function Skill_ge_dang:onBeforePhysicalDamage(evt)
+	local card = evt.card
+	local dam = evt.damage
 
-			Game.log(string.format('[skill][%s%i] %i --> %i', 
-				self:name(), self:lv(), dam:value(), value))
-
-			dam:setValue(value)
+	if dam:type() == Damage.eType.Physical then
+		local value = dam:value() - 20 * self:lv()
+		if value < 0 then
+			value = 0
 		end
+
+		Log.write(string.format('[skill][%s%i] %i --> %i', 
+			self:name(), self:lv(), dam:value(), value))
+
+		dam:setValue(value)
 	end
 end
 
 function Skill_ge_dang:setCard(card)
-	self.m_card = card
+	self.card_ = card
 
-	card.eventBeforePhysicalDamage:regist(self.m_onBeforePhysicalDamage)
+	self.card_:addEventListener(Card.BEFORE_DAM_EVENT, self.onBeforePhysicalDamage, self)
 end
 
 return Skill_ge_dang
