@@ -1,8 +1,6 @@
 --[[
 	@brief scripts/view/handCard.lua
 ]]
-require 'utility.delegate'
-
 HandCard_view = class()
 
 function HandCard_view:ctor()

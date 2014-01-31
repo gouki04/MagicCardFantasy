@@ -1,8 +1,6 @@
 --[[
 	@brief scripts/model/hero/hero.lua
 ]]
-
-require 'utility.delegate'
 local Log = require 'log'
 
 local Card  = import '..card.card'
@@ -39,7 +37,7 @@ end
 
 function Hero:notifyCardDied(evt)
 	local card = evt.card
-	
+
 	local field = self:field()
 	for i = 1, #field do
 		if field[i] == card then

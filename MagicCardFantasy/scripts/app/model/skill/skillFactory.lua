@@ -1,8 +1,6 @@
 --[[
 	@brief skill/skillFactory.lua
 ]]
-require 'utility.delegate'
-
 local m_skillDefine = {}
 
 m_skillDefine[1] = {

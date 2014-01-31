@@ -1,8 +1,6 @@
 --[[
 	@brief scripts/model/skill/skill.lua
 ]]
-require 'utility.delegate'
-
 local Skill = class('Skill', cc.mvc.ModelBase)
 
 function Skill:ctor(properties)

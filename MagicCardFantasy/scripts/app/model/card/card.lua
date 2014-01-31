@@ -1,7 +1,6 @@
 --[[
 	@brief scripts/model/card/card.lua
 ]]
-require 'utility.delegate'
 local Log = require 'log'
 
 local CardDefine   = import '.cardDefine'

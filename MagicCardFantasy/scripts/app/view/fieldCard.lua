@@ -1,8 +1,6 @@
 --[[
 	@brief scripts/view/fieldCard.lua
 ]]
-require 'utility.delegate'
-
 FieldCard_view = class()
 
 function FieldCard_view:ctor()

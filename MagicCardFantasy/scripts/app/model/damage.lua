@@ -1,8 +1,6 @@
 --[[
 	@brief scripts/model/damage.lua
 ]]
-require 'utility.delegate'
-
 local Damage = class('Damage')
 
 Damage.eType = {
