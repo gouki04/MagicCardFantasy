@@ -1,39 +1,41 @@
 --[[
 	@brief scripts/model/damage.lua
 ]]
-local Damage = class('Damage')
+local Damage = class('Damage', cc.mvc.ModelBase)
 
 Damage.eType = {
 	Physical = 1,
 	Magical = 2,
 }
 
-function Damage:ctor(type, value, card)
-	self.m_type = type
-	self.m_value= value
-	self.m_card = card
+-- 定义属性
+Damage.schema = {}
+
+Damage.schema["type"] = {"number"}
+Damage.schema["value"] = {"number"}
+
+function Damage:ctor(properties)
+	Damage.super.ctor(self, properties)
 end
 
-function Damage:init(type, value, card)
-	self.m_type = type
-	self.m_value= value
-	self.m_card = card
+function Damage:source()
+	return self.src_
 end
 
-function Damage:card()
-	return self.m_card
+function Damage:target()
+	return self.trg_
 end
 
 function Damage:setValue(value)
-	self.m_value = value
+	self.value_ = value
 end
 
 function Damage:value()
-	return self.m_value
+	return self.value_
 end
 
 function Damage:type()
-	return self.m_type
+	return self.type_
 end
 
 return Damage

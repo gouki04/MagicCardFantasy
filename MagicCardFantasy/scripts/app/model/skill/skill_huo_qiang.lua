@@ -41,13 +41,16 @@ function Skill_huo_qiang:enter(defend, dcard)
 
 	for i = 1, #selectCards do
 		local card = selectCards[i]
-		local dam = Damage.new()
 		
 		local min = self.lv_ * 25
 		local max = self.lv_ * 50
 		local value = math.floor(math.random(min, max))
 
-		dam:init(Damage.eType.Magical, value, self.card_)
+		local dam = Damage.new({
+				type = Damage.eType.Magical,
+				value = value,
+			})
+
 		Log.write(string.format('[skill][%s%i] fire damage %i --> [card][%s%i]', 
 			self:name(), self:lv(), value, card:name(), card:lv()))
 

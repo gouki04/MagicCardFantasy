@@ -22,6 +22,18 @@ function Skill_bao_ji:enter(defend, dcard)
 		self.additionAtk_ = self.card_:baseAtk() * (0.2 * self.lv_)
 		self.card_:addAdditionAtk(self.additionAtk_)
 
+		app.record:trigger({
+				evtType = 'skill',
+				heroId = self:card():hero():id(),
+				cardId = self:card():id(),
+				skillId = self:id(),
+				effect = {
+					heroId = self:card():hero():id(),
+					cardId = self:card():id(),
+					atk = self:card():atk(),
+				}
+			})
+
 		Log.write(string.format('[skill][%s] atk %i --> %i', self.name_, oldAtk, self.card_:atk()))	
 	end
 end
@@ -29,6 +41,18 @@ end
 function Skill_bao_ji:leave()
 	if self.additionAtk_ ~= nil and self.additionAtk_ > 0 then
 		self.card_:addAdditionAtk(-self.additionAtk_)
+
+		app.record:trigger({
+				evtType = 'skill',
+				heroId = self:card():hero():id(),
+				cardId = self:card():id(),
+				skillId = self:id(),
+				effect = {
+					heroId = self:card():hero():id(),
+					cardId = self:card():id(),
+					atk = self:card():atk(),
+				}
+			})
 
 		self.additionAtk_ = nil
 	end

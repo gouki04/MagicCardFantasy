@@ -112,15 +112,19 @@ function Round:start(attack, defend)
 
 			acard:enter(defend, dcard)
 
+			-- 因为enter时可能会将对位卡打死
+			-- 所以此处要再查询一次对位卡
+			dcard = dfield[i]
 			if dcard == nil then
 				-- attack to hero
-				defend:damage(acard:atk())
+				acard:attackHero(defend)
 			else
 				-- attack to card
-				self:handCardBattle(acard, dcard)
+				acard:attackCard(dcard)
 			end
 
 			acard:leave()
+			app.record:cardLeave(attack, acard)
 		end
 	end
 end

@@ -21,6 +21,7 @@ Hero.ADD_CARD_TO_GRAVE = "ADD_CARD_TO_GRAVE"
 -- 定义属性
 Hero.schema = {}
 
+Hero.schema["id"]   = {"number"}
 Hero.schema["name"] = {"string"}
 Hero.schema["lv"]   = {"number", 1}
 
@@ -55,8 +56,14 @@ function Hero:notifyCardDied(evt)
 	end
 end
 
-function Hero:addCardToDeck(id, lv)
-	local card = DeckCard.new({id = id, lv = lv})
+function Hero:addCardToDeck(id, cardId, lv)
+	local card = DeckCard.new({
+			id     = id,
+			cardId = cardId,
+			lv     = lv,
+			hero   = self,
+		})
+
 	table.insert(self.deck_, card)
 
 	card:toDeck(self)
@@ -65,8 +72,10 @@ end
 
 function Hero:addCardToHand(deck_card)
 	local hand_card = HandCard.new({
-			id = deck_card:id(),
-			lv = deck_card:lv(),
+			id     = deck_card:id(),
+			cardId = deck_card:cardId(),
+			lv     = deck_card:lv(),
+			hero   = self,
 		})
 
 	table.insert(self.hand_, hand_card)
@@ -80,8 +89,10 @@ end
 
 function Hero:addCardToField(hand_card)
 	local field_card = FieldCard.new({
-			id = hand_card:id(),
-			lv = hand_card:lv(),
+			id     = hand_card:id(),
+			cardId = hand_card:cardId(),
+			lv     = hand_card:lv(),
+			hero   = self,
 		})
 
 	table.insert(self.field_, field_card)
@@ -97,8 +108,10 @@ end
 
 function Hero:addCardToGrave(field_card)
 	local grave_card = GraveCard.new({
-			id = field_card:id(),
-			lv = field_card:lv(),
+			id     = field_card:id(),
+			cardId = field_card:cardId(),
+			lv     = field_card:lv(),
+			hero   = self,
 		})
 
 	table.insert(self.grave_, grave_card)
@@ -148,9 +161,18 @@ function Hero:hp()
 end
 
 function Hero:damage(dam)
-	Log.write('[hero]['..self.name_..'] '..self.hp_..' - '..dam.. ' = '..self.hp_ - dam)
-	self:setHp(self.hp_ - dam)
-	return dam
+	self:dispatchEvent({name = Hero.BEFORE_DAM_EVENT, card = self, damage = dam})
+
+	local new_hp = self:hp() - dam:value()
+
+	Log.write(string.format('[card][%s%i] %i-%i=%i', 
+		self:name(), self:lv(), self:hp(), dam:value(), new_hp))
+
+	self:setHp(new_hp)
+
+	self:dispatchEvent({name = Hero.AFTER_DAM_EVENT, card = self, damage = dam})
+
+	return dam:value()
 end
 
 function Hero:dead()

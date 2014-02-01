@@ -3,27 +3,36 @@ local CardDefine   = import '.cardDefine'
 local Card = class('Card', cc.mvc.ModelBase)
 
 -- 定义事件
-Card.BEFORE_ATTACK_EVENT     = "BEFORE_ATTACK_EVENT"
-Card.AFTER_ATTACK_EVENT      = "AFTER_ATTACK_EVENT"
-Card.COST_PHYSICAL_DAM_EVENT = "COST_PHYSICAL_DAM_EVENT"
-Card.BEFORE_DAM_EVENT        = "BEFORE_DAM_EVENT"
-Card.AFTER_DAM_EVENT         = "AFTER_DAM_EVENT"
-Card.DIED_EVENT              = "DIED_EVENT"
+Card.BEFORE_ATTACK_TO_CARD_EVENT     = "BEFORE_ATTACK_TO_CARD_EVENT"
+Card.AFTER_ATTACK_TO_CARD_EVENT      = "AFTER_ATTACK_TO_CARD_EVENT"
+Card.COST_PHYSICAL_DAM_TO_CARD_EVENT = "COST_PHYSICAL_DAM_TO_CARD_EVENT"
+Card.BEFORE_ATTACK_TO_HERO_EVENT     = "BEFORE_ATTACK_TO_HERO_EVENT"
+Card.AFTER_ATTACK_TO_HERO_EVENT      = "AFTER_ATTACK_TO_HERO_EVENT"
+Card.COST_PHYSICAL_DAM_TO_HERO_EVENT = "COST_PHYSICAL_DAM_TO_HERO_EVENT"
+Card.BEFORE_DAM_EVENT                = "BEFORE_DAM_EVENT"
+Card.AFTER_DAM_EVENT                 = "AFTER_DAM_EVENT"
+Card.DIED_EVENT                      = "DIED_EVENT"
 
 -- 定义属性
 Card.schema = {}
 
-Card.schema["id"] = {"number"}
-Card.schema["lv"] = {"number"}
+Card.schema["id"]     = {"number"}
+Card.schema["cardId"] = {"number"}
+Card.schema["lv"]     = {"number"}
+Card.schema["hero"]   = {"table"}
 
 function Card:ctor(properties)
 	Card.super.ctor(self, properties)
 
-    self.info_ = CardDefine.getCardInfo(self.id_)
+    self.info_ = CardDefine.getCardInfo(self.cardId_)
 end
 
 function Card:id()
-	return self.id_
+    return self.id_
+end
+
+function Card:cardId()
+	return self.cardId_
 end
 
 function Card:lv()

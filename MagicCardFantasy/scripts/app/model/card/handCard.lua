@@ -7,13 +7,13 @@ local HandCard = class('HandCard', Card)
 function HandCard:ctor(properties)
     HandCard.super.ctor(self, properties)
 
-    if self.id_ ~= nil and self.lv_ ~= nil then
-        self:init(self.id_, self.lv_)
+    if self.cardId_ ~= nil and self.lv_ ~= nil then
+        self:init(self.cardId_, self.lv_)
     end
 end
 
 function HandCard:init(id, lv)
-    self.id_ = id
+    self.cardId_ = id
     self.lv_ = lv
 
     self.cd_ = self.info_.cd
@@ -31,14 +31,6 @@ function HandCard:init(id, lv)
             table.insert(self.skill_, skill)
         end
     end
-end
-
-function HandCard:id()
-    return self.id_
-end
-
-function HandCard:lv()
-    return self.lv_
 end
 
 function HandCard:cd()
