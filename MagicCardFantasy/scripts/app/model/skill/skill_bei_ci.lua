@@ -7,13 +7,17 @@ local Skill = import '.skill'
 
 Skill_bei_ci = class('Skill_bei_ci', Skill)
 
-function Skill_bei_ci:ctor()
+function Skill_bei_ci:ctor(properties)
+	Skill_bei_ci.super.ctor(self, properties)
+	
 	self.name_ = '背刺'
 	self.first_ = true
 end
 
 function Skill_bei_ci:enter(defend, dcard)
 	if self.first_ then
+		self:triggerBegin()
+
 		local oldAtk = self.card_:atk()
 		self.additionAtk_ = 40 * self.lv_
 		self.card_:addAdditionAtk(self.additionAtk_)
@@ -21,6 +25,8 @@ function Skill_bei_ci:enter(defend, dcard)
 		Log.write(string.format('[skill][%s] atk %i --> %i', self.name_, oldAtk, self.card_:atk()))
 		
 		self.first_ = false
+		
+		self:triggerEnd()
 	end
 end
 

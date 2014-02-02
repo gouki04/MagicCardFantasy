@@ -28,17 +28,7 @@ function FieldCard:init(id, lv)
 	self.hp_ = self.info_.hp + self.info_.hpInc * self.lv_
 	self.cd_ = self.info_.cd
 
-	self.skill_ = {}
-
-	for i = 1, #self.info_.skills do
-		local skillinfo = self.info_.skills[i]
-		if self.lv_ >= skillinfo.needLv then
-			local skill = SkillFactory.createSkillById(skillinfo.id, skillinfo.lv)
-			skill:setCard(self)
-			
-			table.insert(self.skill_, skill)
-		end
-	end
+	self:initSkill()
 end
 
 function FieldCard:atk()
@@ -51,6 +41,8 @@ end
 
 function FieldCard:addBaseAtk(atk)
 	self.atk_ = self.atk_ + atk
+
+	self:dispatchEvent({name = Card.ATK_CHANGED_EVENT, card = self, atk = self:atk()})
 end
 
 function FieldCard:additionAtk()
@@ -59,10 +51,14 @@ end
 
 function FieldCard:addAdditionAtk(atk)
 	self.additionAtk_ = self.additionAtk_ + atk
+
+	self:dispatchEvent({name = Card.ATK_CHANGED_EVENT, card = self, atk = self:atk()})
 end
 
 function FieldCard:setHp(hp)
 	self.hp_ = hp
+
+	self:dispatchEvent({name = Card.HP_CHANGED_EVENT, card = self, hp = self.hp_})
 
 	if self.hp_ <= 0 then
 		self:dispatchEvent({name = Card.DIED_EVENT, card = self})
@@ -74,6 +70,8 @@ function FieldCard:hp()
 end
 
 function FieldCard:enter(defend, dcard)
+	self:dispatchEvent({name = Card.ENTER_EVENT, card = self})
+	
 	for i = 1, #self.skill_ do
 		self.skill_[i]:enter(defend, dcard)
 	end
@@ -83,6 +81,8 @@ function FieldCard:leave()
 	for i = 1, #self.skill_ do
 		self.skill_[i]:leave()
 	end
+
+	self:dispatchEvent({name = Card.LEAVE_EVENT, card = self})
 end
 
 function FieldCard:attackCard(card)
@@ -99,17 +99,6 @@ function FieldCard:attackCard(card)
 	dam = card:damage(dam)
 	if dam > 0 then
 		self:dispatchEvent({name = Card.COST_PHYSICAL_DAM_TO_CARD_EVENT, card = self, target = card, damage = dam})
-		
-		app.record:trigger({
-				evtType = 'card_attack_card',
-				heroId = self:hero():id(),
-				cardId = self:id(),
-				effect = {
-					heroId = card:hero():id(),
-					cardId = card:id(),
-					hp = card:hp(),
-				}
-			})
 	end
 
 	self:dispatchEvent({name = Card.AFTER_ATTACK_TO_CARD_EVENT, card = self, target = card})
@@ -129,16 +118,6 @@ function FieldCard:attackHero(hero)
 	dam = hero:damage(dam)
 	if dam > 0 then
 		self:dispatchEvent({name = Card.COST_PHYSICAL_DAM_TO_HERO_EVENT, card = self, target = hero, damage = dam})
-		
-		app.record:trigger({
-				evtType = 'card_attack_hero',
-				heroId = self:hero():id(),
-				cardId = self:id(),
-				effect = {
-					heroId = hero():id(),
-					hp = hero:hp(),
-				}
-			})
 	end
 
 	self:dispatchEvent({name = Card.AFTER_ATTACK_TO_HERO_EVENT, card = self, target = hero})
@@ -148,10 +127,9 @@ function FieldCard:damage(dam)
 	self:dispatchEvent({name = Card.BEFORE_DAM_EVENT, card = self, damage = dam})
 
 	local new_hp = self:hp() - dam:value()
-	local msg = string.format('[card][%s%i] %i-%i=%i', 
-		self:name(), self:lv(), self:hp(), dam:value(), new_hp)
-
-	Log.write(msg)
+	
+	Log.write(string.format('[card][%s%i] %i-%i=%i', 
+		self:name(), self:lv(), self:hp(), dam:value(), new_hp))
 
 	self:setHp(new_hp)
 

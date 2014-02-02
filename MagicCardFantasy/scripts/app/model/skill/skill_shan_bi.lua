@@ -8,7 +8,9 @@ local Skill = import '.skill'
 
 Skill_shan_bi = class('Skill_shan_bi', Skill)
 
-function Skill_shan_bi:ctor()
+function Skill_shan_bi:ctor(properties)
+	Skill_shan_bi.super.ctor(self, properties)
+	
 	self.m_name = '闪避'
 end
 
@@ -19,10 +21,12 @@ function Skill_shan_bi:onBeforePhysicalDamage(evt)
 	if dam:type() == DamageType_Physical then
 		local rate = 0.2 + self:lv() * 0.05
 		if math.random(0, 1) < rate then
+			self:triggerBegin()
 			Log.write(string.format('[skill][%s%i] %i --> %i', 
 				self.m_name, self:lv(), dam:value(), 0))
 
 			dam:setValue(0)
+			self:triggerEnd()
 		end
 	end
 end

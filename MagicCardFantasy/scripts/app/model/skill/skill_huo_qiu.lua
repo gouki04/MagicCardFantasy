@@ -8,7 +8,9 @@ local Skill  = import '.skill'
 
 Skill_huo_qiu = class('Skill_huo_qiu', Skill)
 
-function Skill_huo_qiu:ctor()
+function Skill_huo_qiu:ctor(properties)
+	Skill_huo_qiu.super.ctor(self, properties)
+	
 	self.name_ = '火球'
 end
 
@@ -32,6 +34,7 @@ function Skill_huo_qiu:enter(defend, dcard)
 		end
 	end
 
+	self:triggerBegin()
 	if selectCard then
 		local min = self.lv_ * 25
 		local max = self.lv_ * 50
@@ -47,6 +50,7 @@ function Skill_huo_qiu:enter(defend, dcard)
 
 		selectCard:damage(dam)
 	end
+	self:triggerEnd()
 end
 
 return Skill_huo_qiu

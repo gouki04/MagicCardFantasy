@@ -8,7 +8,9 @@ local Skill  = import '.skill'
 
 Skill_lie_yan_feng_bao = class('Skill_lie_yan_feng_bao', Skill)
 
-function Skill_lie_yan_feng_bao:ctor()
+function Skill_lie_yan_feng_bao:ctor(properties)
+	Skill_lie_yan_feng_bao.super.ctor(self, properties)
+	
 	self.name_ = '烈焰风暴'
 end
 
@@ -20,6 +22,7 @@ function Skill_lie_yan_feng_bao:enter(defend, dcard)
 		return
 	end
 
+	self:triggerBegin()
 	for i = 1, 10 do
 		local card = dfield[i]
 		if card ~= nil then
@@ -38,6 +41,7 @@ function Skill_lie_yan_feng_bao:enter(defend, dcard)
 			card:damage(dam)
 		end
 	end
+	self:triggerEnd()
 end
 
 return Skill_lie_yan_feng_bao

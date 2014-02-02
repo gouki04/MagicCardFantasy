@@ -9,7 +9,7 @@ local CARD_RACE_HELL    = 4
 
 local m_cards = {}
 
-m_cards[1] = {
+m_cards[56] = {
 	star   = 4,
 	atk    = 210,
 	atkInc = 24,
@@ -28,7 +28,7 @@ m_cards[1] = {
 	},
 }
 
-m_cards[2] = {
+m_cards[106] = {
 	star   = 3,
 	atk    = 165,
 	atkInc = 29,
@@ -57,7 +57,7 @@ m_cards[2] = {
 	},
 }
 
-m_cards[3] = {
+m_cards[26] = {
 	star   = 4,
 	atk    = 220,
 	atkInc = 19,

@@ -15,6 +15,8 @@ Game.HERO_DIED_EVENT     = "HERO_DIED_EVENT"
 Game.EMPTY_CARD_EVENT    = "EMPTY_CARD_EVENT"
 Game.END_EVENT           = "END_EVENT"
 Game.ROUND_END_EVENT     = "ROUND_END_EVENT"
+Game.GAME_START_EVENT    = "GAME_START_EVENT"
+Game.ROUND_START_EVENT   = "ROUND_START_EVENT"
 
 function Game:ctor(properties)
 	Game.super.ctor(self, properties)
@@ -54,6 +56,8 @@ function Game:start(hero1, hero2)
 
 	self.hero1_:addEventListener(Hero.DIED_EVENT, self.notifyHeroDied, self)
 	self.hero2_:addEventListener(Hero.DIED_EVENT, self.notifyHeroDied, self)
+
+	self:dispatchEvent({name = Game.GAME_START_EVENT, game = self, hero1 = self.hero1_, hero2 = self.hero2_})
 end
 
 function Game:swapSide()
@@ -75,6 +79,8 @@ function Game:nextRound(userCmds)
 	if self.end_ then return end
 
 	-- 开始回合
+	self:dispatchEvent({name = Game.ROUND_START_EVENT, game = self})
+
 	self.round_:start(self.attack_, self.defend_)
 	Log.write('\n[game] round '..self.round_:count()..' start')
 

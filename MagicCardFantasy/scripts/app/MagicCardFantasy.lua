@@ -19,7 +19,32 @@ function MagicCardFantasy:run()
 end
 
 function MagicCardFantasy:enterBattleScene()
-    self:enterScene("BattleScene", nil, "fade", 0.6, display.COLOR_WHITE)
+    -- 配置双方的牌堆
+    local hero1 = {
+        id = 1,
+        name = 'a',
+        lv = 20,
+        deck = {
+            [1] = {id = 56, lv = 3},
+            [2] = {id = 106, lv = 5},
+            [3] = {id = 26, lv = 7},
+            [4] = {id = 56, lv = 9},
+            [5] = {id = 106, lv = 1},
+        }
+    }
+
+    local hero2 = {
+        id = 2,
+        name = 'b',
+        lv = 18,
+        deck = {
+            [11] = {id = 106, lv = 10},
+            [12] = {id = 106, lv = 10},
+            [13] = {id = 26, lv = 10},
+        }
+    }
+
+    self:enterScene("BattleScene", {hero1, hero2}, "fade", 0.6, display.COLOR_WHITE)
 end
 
 return MagicCardFantasy

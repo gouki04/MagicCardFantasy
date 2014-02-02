@@ -8,7 +8,9 @@ local Skill  = import '.skill'
 
 Skill_huo_qiang = class('Skill_huo_qiang', Skill)
 
-function Skill_huo_qiang:ctor()
+function Skill_huo_qiang:ctor(properties)
+	Skill_huo_qiang.super.ctor(self, properties)
+	
 	self.name_ = '火墙'
 end
 
@@ -39,6 +41,7 @@ function Skill_huo_qiang:enter(defend, dcard)
 		end
 	end
 
+	self:triggerBegin()
 	for i = 1, #selectCards do
 		local card = selectCards[i]
 		
@@ -56,6 +59,7 @@ function Skill_huo_qiang:enter(defend, dcard)
 
 		card:damage(dam)
 	end
+	self:triggerEnd()
 end
 
 return Skill_huo_qiang

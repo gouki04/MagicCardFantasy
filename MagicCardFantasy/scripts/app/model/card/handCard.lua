@@ -21,16 +21,7 @@ function HandCard:init(id, lv)
     -- 部分技能可以作用于手牌的卡，例如传送
     -- 而这时候部分防御技能可以发挥作用，如免疫
     -- 所以手牌的卡还是需要初始化其技能
-    self.skill_ = {}
-    for i = 1, #self.info_.skills do
-        local skillinfo = self.info_.skills[i]
-        if self.lv_ >= skillinfo.needLv then
-            local skill = SkillFactory.createSkillById(skillinfo.id, skillinfo.lv)
-            skill:setCard(self)
-            
-            table.insert(self.skill_, skill)
-        end
-    end
+    self:initSkill()
 end
 
 function HandCard:cd()
@@ -40,6 +31,8 @@ end
 function HandCard:reduceCd()
     if self.cd_ >= 1 then
         self.cd_ = self.cd_ - 1
+
+        self:dispatchEvent({name = Card.CD_CHANGE_EVENT, card = self, cd = self.cd_})
     end
 end
 

@@ -1,4 +1,6 @@
 local CardDefine   = import '.cardDefine'
+local Skill        = import '..skill.skill'
+local SkillFactory = import '..skill.skillFactory'
 
 local Card = class('Card', cc.mvc.ModelBase)
 
@@ -12,6 +14,12 @@ Card.COST_PHYSICAL_DAM_TO_HERO_EVENT = "COST_PHYSICAL_DAM_TO_HERO_EVENT"
 Card.BEFORE_DAM_EVENT                = "BEFORE_DAM_EVENT"
 Card.AFTER_DAM_EVENT                 = "AFTER_DAM_EVENT"
 Card.DIED_EVENT                      = "DIED_EVENT"
+Card.ATK_CHANGED_EVENT               = "ATK_CHANGED_EVENT"
+Card.HP_CHANGED_EVENT                = "HP_CHANGED_EVENT"
+Card.ENTER_EVENT                     = "ENTER_EVENT"
+Card.LEAVE_EVENT                     = "LEAVE_EVENT"
+Card.SKILL_TRIGGER_EVENT             = "SKILL_TRIGGER_EVENT"
+Card.CD_CHANGE_EVENT                 = "CD_CHANGE_EVENT"
 
 -- 定义属性
 Card.schema = {}
@@ -25,6 +33,29 @@ function Card:ctor(properties)
 	Card.super.ctor(self, properties)
 
     self.info_ = CardDefine.getCardInfo(self.cardId_)
+end
+
+function Card:notifySkillTrigger(evt)
+    self:dispatchEvent({name = Card.SKILL_TRIGGER_EVENT, card = self, skill = evt.skill})
+end
+
+function Card:addSkill(skill)
+    skill:setCard(self)
+    skill:addEventListener(Skill.TRIGGER_EVENT, self.notifySkillTrigger, self)
+
+    table.insert(self.skill_, skill)
+end
+
+function Card:initSkill()
+    self.skill_ = {}
+
+    for i = 1, #self.info_.skills do
+        local skillinfo = self.info_.skills[i]
+        if self.lv_ >= skillinfo.needLv then
+            local skill = SkillFactory.createSkillById(skillinfo.id, skillinfo.lv)
+            self:addSkill(skill)
+        end
+    end
 end
 
 function Card:id()
@@ -41,6 +72,10 @@ end
 
 function Card:hero()
     return self.hero_
+end
+
+function Card:heroId()
+    return self:hero():id()
 end
 
 function Card:setHero(hero)

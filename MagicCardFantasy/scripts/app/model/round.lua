@@ -69,8 +69,9 @@ function Round:start(attack, defend)
 			i = math.random(1, #deck)
 		end
 
-		attack:addCardToHand(deck[i])
-		table.remove(deck, i)
+		local card = deck[i]
+		attack:removeCardFromDeckByIdx(i)
+		attack:addCardToHand(card)
 	end
 
 	-- 计算cd
@@ -94,8 +95,9 @@ function Round:start(attack, defend)
 		local i = 1
 		while hand[i] ~= nil do
 			if hand[i]:cd() <= 0 then
-				attack:addCardToField(hand[i])
-				table.remove(hand, i)
+				local card = hand[i]
+				attack:removeCardFromHandByIdx(i)
+				attack:addCardToField(card)
 			else
 				i = i + 1
 			end
@@ -124,7 +126,6 @@ function Round:start(attack, defend)
 			end
 
 			acard:leave()
-			app.record:cardLeave(attack, acard)
 		end
 	end
 end

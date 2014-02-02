@@ -9,7 +9,9 @@ local Skill  = import '.skill'
 
 Skill_ge_dang = class('Skill_ge_dang', Skill)
 
-function Skill_ge_dang:ctor()
+function Skill_ge_dang:ctor(properties)
+	Skill_ge_dang.super.ctor(self, properties)
+	
 	self.name_ = '格挡'
 end
 
@@ -18,6 +20,8 @@ function Skill_ge_dang:onBeforePhysicalDamage(evt)
 	local dam = evt.damage
 
 	if dam:type() == Damage.eType.Physical then
+		self:triggerBegin()
+
 		local value = dam:value() - 20 * self:lv()
 		if value < 0 then
 			value = 0
@@ -27,6 +31,8 @@ function Skill_ge_dang:onBeforePhysicalDamage(evt)
 			self:name(), self:lv(), dam:value(), value))
 
 		dam:setValue(value)
+		
+		self:triggerEnd()
 	end
 end
 

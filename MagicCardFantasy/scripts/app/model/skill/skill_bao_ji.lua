@@ -7,7 +7,9 @@ local Skill = import '.skill'
 
 Skill_bao_ji = class('Skill_bao_ji', Skill)
 
-function Skill_bao_ji:ctor()
+function Skill_bao_ji:ctor(properties)
+	Skill_bao_ji.super.ctor(self, properties)
+	
 	self.name_ = '暴击'
 end
 
@@ -18,41 +20,21 @@ function Skill_bao_ji:enter(defend, dcard)
 
 	local rate = 0.5
 	if math.random(0, 1) < rate then
+		self:triggerBegin()
+
 		local oldAtk = self.card_:atk()
 		self.additionAtk_ = self.card_:baseAtk() * (0.2 * self.lv_)
 		self.card_:addAdditionAtk(self.additionAtk_)
 
-		app.record:trigger({
-				evtType = 'skill',
-				heroId = self:card():hero():id(),
-				cardId = self:card():id(),
-				skillId = self:id(),
-				effect = {
-					heroId = self:card():hero():id(),
-					cardId = self:card():id(),
-					atk = self:card():atk(),
-				}
-			})
+		Log.write(string.format('[skill][%s] atk %i --> %i', self.name_, oldAtk, self.card_:atk()))
 
-		Log.write(string.format('[skill][%s] atk %i --> %i', self.name_, oldAtk, self.card_:atk()))	
+		self:triggerEnd()
 	end
 end
 
 function Skill_bao_ji:leave()
 	if self.additionAtk_ ~= nil and self.additionAtk_ > 0 then
 		self.card_:addAdditionAtk(-self.additionAtk_)
-
-		app.record:trigger({
-				evtType = 'skill',
-				heroId = self:card():hero():id(),
-				cardId = self:card():id(),
-				skillId = self:id(),
-				effect = {
-					heroId = self:card():hero():id(),
-					cardId = self:card():id(),
-					atk = self:card():atk(),
-				}
-			})
 
 		self.additionAtk_ = nil
 	end
