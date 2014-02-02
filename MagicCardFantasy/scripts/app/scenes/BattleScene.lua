@@ -1,12 +1,11 @@
 require 'utility.utility'
 
-local Hero          = import '..model.hero.hero'
-local Game          = import '..model.game'
-local FieldCardView = import '..view.fieldCardView'
-local HandCardView  = import '..view.HandCardView'
-local Track         = import '..model.track'
-local Timer         = require 'framework.api.Timer'
-local scheduler     = require 'framework.scheduler'
+local Hero             = import '..model.hero.hero'
+local Game             = import '..model.game'
+local FieldCardRowView = import '..view.FieldCardRowView'
+local HandCardRowView  = import '..view.HandCardRowView'
+local Track            = import '..model.track'
+local scheduler        = require 'framework.scheduler'
 
 local BattleScene = class("BattleScene", function()
     return display.newScene("BattleScene")
@@ -16,13 +15,23 @@ function BattleScene:ctor(hero1Info, hero2Info)
     self.hero1_ = hero1Info
     self.hero2_ = hero2Info
 
-    self.handCards_ = {}
-    self.handCards_[self.hero1_.id] = {}
-    self.handCards_[self.hero2_.id] = {}
+    self.hand_ = {}
+    self.hand_[self.hero1_.id] = HandCardRowView.new(self.hero1_)
+        :align(display.BOTTOM_LEFT, 100, 0)
+        :addTo(self)
 
-    self.fieldCards_ = {}
-    self.fieldCards_[self.hero1_.id] = {}
-    self.fieldCards_[self.hero2_.id] = {}
+    self.hand_[self.hero2_.id] = HandCardRowView.new(self.hero2_)
+        :align(display.BOTTOM_LEFT, 100, display.top - 110)
+        :addTo(self)
+
+    self.field_ = {}
+    self.field_[self.hero1_.id] = FieldCardRowView.new(self.hero1_)
+        :align(display.BOTTOM_LEFT, 100, 150)
+        :addTo(self)
+
+    self.field_[self.hero2_.id] = FieldCardRowView.new(self.hero1_)
+        :align(display.BOTTOM_LEFT, 100, display.top - 150 - 170)
+        :addTo(self)
 
     self.heros_ = {}
     self.heros_[self.hero1_.id] = self.hero1_
@@ -59,95 +68,7 @@ function BattleScene:ctor(hero1Info, hero2Info)
     self.trackInfo_ = self.trackEngine_:finish()
     self.trackInfo_.idx = 1
 
-    self.timerCnt_ = 1
-    self.timer_ = Timer.new()
-
     -- app.game = self.game_
-end
-
-function BattleScene:updateHandCard(heroId)
-    local y
-    if heroId == self.hero1_.id then
-        y = 0
-    else
-        y = display.top - 110
-    end
-
-    for i, v in ipairs(self.handCards_[heroId]) do
-        v:pos(100 + i * (110 + 10), y)
-    end
-end
-
-function BattleScene:reorderField()
-    -- hero 1
-    local field = self.fieldCards_[self.hero1_.id]
-    local field_cnt = table.count(field)
-    if field_cnt > 0 then
-        local idx = 1
-        for i = 1, 10 do
-            if field[i] ~= nil then
-                if idx ~= i then
-                    field[idx] = field[i]
-                    field[i] = nil
-                end
-                
-                idx = idx + 1
-                if idx > field_cnt then
-                    break
-                end
-            end
-        end
-    end
-
-    for i = 1, #field do
-        local card = field[i]
-        if card then
-            card:pos(100 + i * (110 + 10), 150)
-        end
-    end
-
-    -- hero 2
-    local field = self.fieldCards_[self.hero2_.id]
-    local field_cnt = table.count(field)
-    if field_cnt > 0 then
-        local idx = 1
-        for i = 1, 10 do
-            if field[i] ~= nil then
-                if idx ~= i then
-                    field[idx] = field[i]
-                    field[i] = nil
-                end
-                
-                idx = idx + 1
-                if idx > field_cnt then
-                    break
-                end
-            end
-        end
-    end
-
-    for i = 1, #field do
-        local card = field[i]
-        if card then
-            card:pos(100 + i * (110 + 10), display.top - 150 - 170)
-        end
-    end
-end
-
-function BattleScene:updateFieldCard(heroId)
-    local y
-    if heroId == self.hero1_.id then
-        y = 150
-    else
-        y = display.top - 150 - 170
-    end
-
-    for i = 1, 10 do
-        local card = self.fieldCards_[heroId][i]
-        if card then
-            card:pos(100 + i * (110 + 10), y)
-        end
-    end
 end
 
 function BattleScene:executeNextCmd()
@@ -169,28 +90,16 @@ function BattleScene:executeNextCmd()
         scheduler.performWithDelayGlobal(
             function(evt)
                 local cardTypeId = self.heros_[cmd.heroId].deck[cmd.cardId].id
+                self.hand_[cmd.heroId]:addCard(cmd.cardId, cardTypeId)
 
-                local handCardView = HandCardView.new(cmd.heroId, cmd.cardId, cardTypeId)
-                    :align(display.BOTTOM_LEFT)
-                    :addTo(self)
-
-                table.insert(self.handCards_[cmd.heroId], handCardView)
-
-                self:updateHandCard(cmd.heroId)
                 self:executeNextCmd()
             end, 1)
     elseif cmdType == Track.HERO_ADD_CARD_TO_FIELD then
         scheduler.performWithDelayGlobal(
             function(evt)
                 local cardTypeId = self.heros_[cmd.heroId].deck[cmd.cardId].id
+                self.field_[cmd.heroId]:addCard(cmd.cardId, cardTypeId, cmd.cardLv, cmd.idx)
 
-                local fieldCardView = FieldCardView.new(cmd.heroId, cmd.cardId, cardTypeId, cmd.cardLv)
-                    :align(display.BOTTOM_LEFT)
-                    :addTo(self)
-
-                self.fieldCards_[cmd.heroId][cmd.idx] = fieldCardView
-
-                self:updateFieldCard(cmd.heroId)
                 self:executeNextCmd()
             end, 1)
     elseif cmdType == Track.HERO_ADD_CARD_TO_GRAVE then
@@ -200,23 +109,14 @@ function BattleScene:executeNextCmd()
     elseif cmdType == Track.HERO_REMOVE_CARD_FROM_HAND then
         scheduler.performWithDelayGlobal(
             function()
-                for i, v in ipairs(self.handCards_[cmd.heroId]) do
-                    if v:cardId() == cmd.cardId then
-                        table.remove(self.handCards_[cmd.heroId], i)
-                        v:removeSelf()
-                        break
-                    end
-                end
+                self.hand_[cmd.heroId]:removeCard(cmd.cardId)
 
-                self:updateHandCard(cmd.heroId)
                 self:executeNextCmd()
             end, 1)
     elseif cmdType == Track.HERO_REMOVE_CARD_FROM_FIELD then
         scheduler.performWithDelayGlobal(
             function()
-                local card = self.fieldCards_[cmd.heroId][cmd.idx]
-                self.fieldCards_[cmd.heroId][cmd.idx] = nil
-                card:removeSelf()
+                self.field_[cmd.heroId]:removeCard(cmd.cardId, cmd.idx)
 
                 self:executeNextCmd()
             end, 1)
@@ -225,12 +125,11 @@ function BattleScene:executeNextCmd()
     elseif cmdType == Track.HERO_PROPERTY_CHANGE then
         self:executeNextCmd()
     elseif cmdType == Track.CARD_CD_CHANGE then
-        local hand = self.handCards_[cmd.heroId]
-        for i, v in pairs(hand) do
-            if v:cardId() == cmd.cardId then
-                v:setCD(cmd.cd)
-            end
+        local card = self.hand_[cmd.heroId]:getCard(cmd.cardId)
+        if card then
+            card:setCD(cmd.cd)
         end
+
         self:executeNextCmd()
     elseif cmdType == Track.CARD_ATTACK_TO_CARD then
         self:executeNextCmd()
@@ -239,19 +138,17 @@ function BattleScene:executeNextCmd()
     elseif cmdType == Track.CARD_PROPERTY_CHANGE then
         scheduler.performWithDelayGlobal(
             function()
-                local field = self.fieldCards_[cmd.heroId]
-                for i, card in pairs(field) do
-                    if card:cardId() == cmd.cardId then
-                        for k, v in pairs(cmd.property) do
-                            if k == 'hp' then
-                                card:setHp(v)
-                            elseif k == 'atk' then
-                                card:setAtk(v)
-                            end
+                local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
+                if card then
+                    for k, v in pairs(cmd.property) do
+                        if k == 'hp' then
+                            card:setHp(v)
+                        elseif k == 'atk' then
+                            card:setAtk(v)
                         end
-                        break
                     end
                 end
+
                 self:executeNextCmd()
             end, 1)
     elseif cmdType == Track.CARD_ENTER then
@@ -261,7 +158,8 @@ function BattleScene:executeNextCmd()
     elseif cmdType == Track.CARD_SKILL_TRIGGER then
         self:executeNextCmd()
     elseif cmdType == Track.ROUND_START then
-        self:reorderField()
+        self.field_[self.hero1_.id]:reorder()
+        self.field_[self.hero2_.id]:reorder()
         self:executeNextCmd()
     end
 end
