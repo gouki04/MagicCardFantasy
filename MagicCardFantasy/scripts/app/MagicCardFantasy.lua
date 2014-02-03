@@ -3,6 +3,7 @@ require("config")
 require("framework.init")
 require("framework.shortcodes")
 require("framework.cc.init")
+require("app.init")
 
 local MagicCardFantasy = class("MagicCardFantasy", cc.mvc.AppBase)
 

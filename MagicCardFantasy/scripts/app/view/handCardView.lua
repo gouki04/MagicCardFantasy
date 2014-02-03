@@ -17,10 +17,11 @@ function HandCardView:ctor(heroId, cardId, cardTypeId)
 	self.sprite_ = display.newSprite(sprFileName):addTo(self)
 		:align(display.BOTTOM_LEFT)
 
-	self.cdLabel_ = ui.newTTFLabel({
+	self.cdLabel_ = ui.newTTFLabelWithShadow({
             text = string.format("cd:%s", self.cardInfo_.cd),
             size = 22,
             color = display.COLOR_WHITE,
+            align = ui.TEXT_ALIGN_CENTER,
         })
 		:align(display.CENTER, 55, 55)
         :addTo(self)
