@@ -14,13 +14,17 @@ Track.HERO_REMOVE_CARD_FROM_FIELD = 7
 Track.HERO_REMOVE_CARD_FROM_GRAVE = 8
 Track.HERO_PROPERTY_CHANGE        = 9
 Track.CARD_CD_CHANGE              = 10
-Track.CARD_ATTACK_TO_CARD         = 11
-Track.CARD_ATTACK_TO_HERO         = 12
-Track.CARD_PROPERTY_CHANGE        = 13
-Track.CARD_ENTER                  = 14
-Track.CARD_LEAVE                  = 15
-Track.CARD_SKILL_TRIGGER          = 16
-Track.ROUND_START                 = 17
+Track.CARD_BEFORE_ATTACK_TO_CARD  = 11
+Track.CARD_AFTER_ATTACK_TO_CARD   = 12
+Track.CARD_BEFORE_ATTACK_TO_HERO  = 13
+Track.CARD_AFTER_ATTACK_TO_HERO   = 14
+Track.CARD_PROPERTY_CHANGE        = 15
+Track.CARD_ENTER                  = 16
+Track.CARD_LEAVE                  = 17
+Track.CARD_SKILL_TRIGGER_BEGIN    = 18
+Track.CARD_SKILL_TRIGGER_END      = 19
+Track.ROUND_START                 = 20
+Track.CARD_ENCOUNTER_SKILL        = 21
 
 function Track:ctor(game)
     self.game_ = game
@@ -76,7 +80,7 @@ function Track:onHeroAddCardToHand(evt)
         })
 
     evt.card:addEventListener(Card.CD_CHANGE_EVENT, self.onCardCdChanged, self)
-    evt.card:addEventListener(Card.SKILL_TRIGGER_EVENT, self.onCardSkillTrigger, self)
+    evt.card:addEventListener(Card.SKILL_TRIGGER_BEGIN_EVENT, self.onCardSkillTriggerBegin, self)
 end
 
 function Track:onHeroAddCardToField(evt)
@@ -88,13 +92,17 @@ function Track:onHeroAddCardToField(evt)
             idx = evt.idx,
         })
 
-    evt.card:addEventListener(Card.BEFORE_ATTACK_TO_CARD_EVENT, self.onCardAttackToCard, self)
-    evt.card:addEventListener(Card.BEFORE_ATTACK_TO_HERO_EVENT, self.onCardAttackToHero, self)
+    evt.card:addEventListener(Card.BEFORE_ATTACK_TO_CARD_EVENT, self.onCardBeforeAttackToCard, self)
+    evt.card:addEventListener(Card.AFTER_ATTACK_TO_CARD_EVENT, self.onCardAfterAttackToCard, self)
+    evt.card:addEventListener(Card.BEFORE_ATTACK_TO_HERO_EVENT, self.onCardBeforeAttackToHero, self)
+    evt.card:addEventListener(Card.AFTER_ATTACK_TO_HERO_EVENT, self.onCardAfterAttackToHero, self)
     evt.card:addEventListener(Card.ATK_CHANGED_EVENT, self.onCardAtkChanged, self)
     evt.card:addEventListener(Card.HP_CHANGED_EVENT, self.onCardHPChanged, self)
     evt.card:addEventListener(Card.ENTER_EVENT, self.onCardEnter, self)
     evt.card:addEventListener(Card.LEAVE_EVENT, self.onCardLeave, self)
-    evt.card:addEventListener(Card.SKILL_TRIGGER_EVENT, self.onCardSkillTrigger, self)
+    evt.card:addEventListener(Card.SKILL_TRIGGER_BEGIN_EVENT, self.onCardSkillTriggerBegin, self)
+    evt.card:addEventListener(Card.SKILL_TRIGGER_END_EVENT, self.onCardSkillTriggerEnd, self)
+    evt.card:addEventListener(Card.ENCOUNTER_SKILL_EVENT, self.onCardEncounterSkill, self)
 end
 
 function Track:onHeroAddCardToGrave(evt)
@@ -157,24 +165,40 @@ function Track:onCardCdChanged(evt)
         })
 end
 
-function Track:onCardAttackToCard(evt)
+function Track:onCardBeforeAttackToCard(evt)
     self:record({
-            cmdType = Track.CARD_ATTACK_TO_CARD,
+            cmdType = Track.CARD_BEFORE_ATTACK_TO_CARD,
             heroId = evt.card:heroId(),
             cardId = evt.card:id(),
             target = {
-                heroId = evt.target:heroId(),
-                cardId = evt.target:id(),
+                heroId = evt.targetCard:heroId(),
+                cardId = evt.targetCard:id(),
             }
         })
 end
 
-function Track:onCardAttackToHero(evt)
+function Track:onCardAfterAttackToCard(evt)
     self:record({
-            cmdType = Track.CARD_ATTACK_TO_HERO,
+            cmdType = Track.CARD_AFTER_ATTACK_TO_CARD,
             heroId = evt.card:heroId(),
             cardId = evt.card:id(),
-            target = evt.target:id(),
+        })
+end
+
+function Track:onCardBeforeAttackToHero(evt)
+    self:record({
+            cmdType = Track.CARD_BEFORE_ATTACK_TO_HERO,
+            heroId = evt.card:heroId(),
+            cardId = evt.card:id(),
+            target = evt.targetCard:id(),
+        })
+end
+
+function Track:onCardAfterAttackToHero(evt)
+    self:record({
+            cmdType = Track.CARD_AFTER_ATTACK_TO_HERO,
+            heroId = evt.card:heroId(),
+            cardId = evt.card:id(),
         })
 end
 
@@ -216,9 +240,27 @@ function Track:onCardLeave(evt)
         })
 end
 
-function Track:onCardSkillTrigger(evt)
+function Track:onCardSkillTriggerBegin(evt)
     self:record({
-            cmdType = Track.CARD_SKILL_TRIGGER,
+            cmdType = Track.CARD_SKILL_TRIGGER_BEGIN,
+            heroId = evt.card:heroId(),
+            cardId = evt.card:id(),
+            skillId = evt.skill:id(),
+        })
+end
+
+function Track:onCardSkillTriggerEnd(evt)
+    self:record({
+            cmdType = Track.CARD_SKILL_TRIGGER_END,
+            heroId = evt.card:heroId(),
+            cardId = evt.card:id(),
+            skillId = evt.skill:id(),
+        })
+end
+
+function Track:onCardEncounterSkill(evt)
+    self:record({
+            cmdType = Track.CARD_ENCOUNTER_SKILL,
             heroId = evt.card:heroId(),
             cardId = evt.card:id(),
             skillId = evt.skill:id(),

@@ -4,9 +4,10 @@ local FieldCardRowView = class('FieldCardRowView', function()
     return display.newNode()
 end)
 
-function FieldCardRowView:ctor(hero)
+function FieldCardRowView:ctor(hero, side)
     self.cards_ = {}
     self.hero_ = hero
+    self.side_ = side
 end
 
 function FieldCardRowView:update()
@@ -44,6 +45,7 @@ end
 function FieldCardRowView:addCard(cardId, cardTypeId, cardLv, idx)
     local fieldCardView = FieldCardView.new(self.hero_.id, cardId, cardTypeId, cardLv)
         :align(display.BOTTOM_LEFT, -110, 0)
+        :setSide(self.side_)
         :addTo(self)
 
     self.cards_[idx] = fieldCardView

@@ -24,7 +24,7 @@ function MagicCardFantasy:enterBattleScene()
     local hero1 = {
         id = 1,
         name = 'a',
-        lv = 20,
+        lv = 25,
         deck = {
             [1] = {id = 56, lv = 3},
             [2] = {id = 106, lv = 5},

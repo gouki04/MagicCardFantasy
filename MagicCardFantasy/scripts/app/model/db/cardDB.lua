@@ -6,6 +6,7 @@ local CARD_RACE_HELL    = 4
 local cards_ = {}
 
 cards_[56] = {
+	id     = 56,
 	star   = 4,
 	atk    = 210,
 	atkInc = 24,
@@ -17,6 +18,11 @@ cards_[56] = {
 	race   = CARD_RACE_KINGDOM,
 	skills = {
 		{
+			id = 8,
+			lv = 6,
+			needLv = 0,
+		},
+		{
 			id = 7,
 			lv = 5,
 			needLv = 5,
@@ -25,6 +31,7 @@ cards_[56] = {
 }
 
 cards_[106] = {
+	id     = 106,
 	star   = 3,
 	atk    = 165,
 	atkInc = 29,
@@ -54,6 +61,7 @@ cards_[106] = {
 }
 
 cards_[26] = {
+	id     = 26,
 	star   = 4,
 	atk    = 220,
 	atkInc = 19,

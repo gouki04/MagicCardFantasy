@@ -13,17 +13,19 @@ end
 function Skill_wang_guo_zhi_li:onHeroAddCardToField(evt)
 	local card = evt.card
 	if card:race() == db.race.kingdom then
+		card:encounterSkill(self)
 		card:addBaseAtk(self.additionAtk_)
 	end
 end
 
-function Skill_wang_guo_zhi_li:toField(hero, card)
+function Skill_wang_guo_zhi_li:enterField(hero, card)
 	self.additionAtk_ = 25 * self.lv_
 
 	local field = hero:field()
 
 	for k, v in pairs(field) do
 		if v:race() == db.race.kingdom then
+			v:encounterSkill(self)
 			v:addBaseAtk(self.additionAtk_)
 		end
 	end
@@ -31,9 +33,7 @@ function Skill_wang_guo_zhi_li:toField(hero, card)
 	hero:addEventListener(Hero.ADD_CARD_TO_FIELD, self.onHeroAddCardToField, self)
 end
 
-function Skill_wang_guo_zhi_li:leaveField(hero, card)
-	self.additionAtk_ = 25 * self.lv_
-	
+function Skill_wang_guo_zhi_li:leaveField(hero, card)	
 	local field = hero:field()
 
 	for k, v in pairs(field) do
@@ -41,6 +41,8 @@ function Skill_wang_guo_zhi_li:leaveField(hero, card)
 			v:addBaseAtk(-self.additionAtk_)
 		end
 	end
+
+	hero:removeEventListener(Hero.ADD_CARD_TO_FIELD, self.onHeroAddCardToField, self)
 end
 
 return Skill_wang_guo_zhi_li

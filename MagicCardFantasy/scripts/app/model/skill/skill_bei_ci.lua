@@ -18,6 +18,8 @@ function Skill_bei_ci:enter(defend, dcard)
 	if self.first_ then
 		self:triggerBegin()
 
+		self.card_:encounterSkill(self)
+
 		local oldAtk = self.card_:atk()
 		self.additionAtk_ = 40 * self.lv_
 		self.card_:addAdditionAtk(self.additionAtk_)

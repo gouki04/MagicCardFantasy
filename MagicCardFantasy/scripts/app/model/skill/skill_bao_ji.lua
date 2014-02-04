@@ -22,6 +22,8 @@ function Skill_bao_ji:enter(defend, dcard)
 	if math.random(0, 1) < rate then
 		self:triggerBegin()
 
+		self.card_:encounterSkill(self)
+
 		local oldAtk = self.card_:atk()
 		self.additionAtk_ = self.card_:baseAtk() * (0.2 * self.lv_)
 		self.card_:addAdditionAtk(self.additionAtk_)

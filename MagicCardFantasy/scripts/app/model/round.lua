@@ -112,20 +112,24 @@ function Round:start(attack, defend)
 		if acard ~= nil then
 			local dcard = dfield[i]
 
-			acard:enter(defend, dcard)
+			local enterSucceed = acard:beforeEnter(defend, dcard)
 
-			-- 因为enter时可能会将对位卡打死
-			-- 所以此处要再查询一次对位卡
-			dcard = dfield[i]
-			if dcard == nil then
-				-- attack to hero
-				acard:attackHero(defend)
-			else
-				-- attack to card
-				acard:attackCard(dcard)
+			if enterSucceed then
+				acard:enter(defend, dcard)
+
+				-- 因为enter时可能会将对位卡打死
+				-- 所以此处要再查询一次对位卡
+				dcard = dfield[i]
+				if dcard == nil then
+					-- attack to hero
+					acard:attackHero(defend)
+				else
+					-- attack to card
+					acard:attackCard(dcard)
+				end
+
+				acard:leave()
 			end
-
-			acard:leave()
 		end
 	end
 end

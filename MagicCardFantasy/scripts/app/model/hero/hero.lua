@@ -40,15 +40,29 @@ function Hero:ctor(properties)
 	self.field_ = {}
 	self.grave_ = {}
 
-	if self.lv_ ~= nil and self.name_ ~= nil then
-		self:init(self.lv_, self.name_)
-	end
+	self:init()
 end
 
-function Hero:init(lv, name)
-	self.name_ = name
-	self.lv_ = lv
-	self.hp_ = 1000 + lv * 70
+function Hero:init()
+	self.hp_ = 1000 + self.lv_ * 70
+end
+
+function Hero:destroy()
+	for k, v in pairs(self.deck_) do
+		v:destroy()
+	end
+
+	for k, v in pairs(self.hand_) do
+		v:destroy()
+	end
+
+	for k, v in pairs(self.field_) do
+		v:destroy()
+	end
+
+	for k, v in pairs(self.grave_) do
+		v:destroy()
+	end
 end
 
 function Hero:notifyCardDied(evt)
@@ -66,63 +80,76 @@ end
 
 function Hero:removeCardFromDeckByIdx(idx)
 	local card = self:deck()[idx]
+	card:leaveDeck()
+	card:destroy()
+
 	table.remove(self:deck(), idx)
 
 	self:dispatchEvent({name = Hero.REMOVE_CARD_FROM_DECK, hero = self, card = card, idx = idx})
 end
 
 function Hero:addCardToDeck(id, cardId, lv)
-	local card = DeckCard.new({
+	local deck_card = DeckCard.new({
 			id     = id,
 			cardId = cardId,
 			lv     = lv,
 			hero   = self,
 		})
 
-	table.insert(self.deck_, card)
+	table.insert(self.deck_, deck_card)
 
-	card:toDeck(self)
+	deck_card:enterDeck(self)
 
-	self:dispatchEvent({name = Hero.ADD_CARD_TO_DECK, hero = self, card = card})
+	self:dispatchEvent({name = Hero.ADD_CARD_TO_DECK, hero = self, card = deck_card})
+
+	return deck_card
 end
 
 function Hero:removeCardFromHandByIdx(idx)
 	local card = self:hand()[idx]
+	card:leaveHand()
+	card:destroy()
+
 	table.remove(self:hand(), idx)
 
 	self:dispatchEvent({name = Hero.REMOVE_CARD_FROM_HAND, hero = self, card = card, idx = idx})
 end
 
-function Hero:addCardToHand(deck_card)
+function Hero:addCardToHand(card)
 	local hand_card = HandCard.new({
-			id     = deck_card:id(),
-			cardId = deck_card:cardId(),
-			lv     = deck_card:lv(),
+			id     = card:id(),
+			cardId = card:cardId(),
+			lv     = card:lv(),
 			hero   = self,
 		})
 
 	table.insert(self.hand_, hand_card)
 
-	hand_card:toHand(self)
+	hand_card:enterHand(self)
 
 	self:dispatchEvent({name = Hero.ADD_CARD_TO_HAND, hero = self, card = hand_card})
 
 	Log.write(string.format('[hero][%s] put card[%s%i] to hand', 
 		self:name(), hand_card:name(), hand_card:lv()))
+
+	return hand_card
 end
 
 function Hero:removeCardFromFieldByIdx(idx)
 	local card = self:field()[idx]
+	card:leaveField()
+	card:destroy()
+
 	self:field()[idx] = nil
 
 	self:dispatchEvent({name = Hero.REMOVE_CARD_FROM_FIELD, hero = self, card = card, idx = idx})
 end
 
-function Hero:addCardToField(hand_card)
+function Hero:addCardToField(card)
 	local field_card = FieldCard.new({
-			id     = hand_card:id(),
-			cardId = hand_card:cardId(),
-			lv     = hand_card:lv(),
+			id     = card:id(),
+			cardId = card:cardId(),
+			lv     = card:lv(),
 			hero   = self,
 		})
 
@@ -130,37 +157,48 @@ function Hero:addCardToField(hand_card)
 
 	field_card:addEventListener(Card.DIED_EVENT, self.notifyCardDied, self)
 
-	field_card:toField(self)
+	field_card:enterField(self)
 
 	self:dispatchEvent({name = Hero.ADD_CARD_TO_FIELD, hero = self, card = field_card, idx = #self.field_})
 
 	Log.write(string.format('[hero][%s] put card[%s%i] to field', 
 		self:name(), field_card:name(), field_card:lv()))
+
+	return field_card
+end
+
+function Hero:removeCardFromGrave(card)
+	self:removeCardFromGraveById(card:id())
 end
 
 function Hero:removeCardFromGraveById(id)
 	local card = self:grave()[id]
+	card:leaveGrave()
+	card:destroy()
+
 	self:grave()[id] = nil
 
 	self:dispatchEvent({name = Hero.REMOVE_CARD_FROM_GRAVE, hero = self, card = card})
 end
 
-function Hero:addCardToGrave(field_card)
+function Hero:addCardToGrave(card)
 	local grave_card = GraveCard.new({
-			id     = field_card:id(),
-			cardId = field_card:cardId(),
-			lv     = field_card:lv(),
+			id     = card:id(),
+			cardId = card:cardId(),
+			lv     = card:lv(),
 			hero   = self,
 		})
 
 	self.grave_[grave_card:id()] = grave_card
 
-	grave_card:toGrave(self)
+	grave_card:enterGrave(self)
 
 	self:dispatchEvent({name = Hero.ADD_CARD_TO_GRAVE, hero = self, card = grave_card})
 
 	Log.write(string.format('[hero][%s] put card[%s%i] to grave', 
 		self:name(), grave_card:name(), grave_card:lv()))
+
+	return grave_card
 end
 
 function Hero:id()

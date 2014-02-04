@@ -17,29 +17,29 @@ function BattleScene:ctor(hero1Info, hero2Info)
     self.hero2_ = hero2Info
 
     self.hand_ = {}
-    self.hand_[self.hero1_.id] = HandCardRowView.new(self.hero1_)
+    self.hand_[self.hero1_.id] = HandCardRowView.new(self.hero1_, 'side.down')
         :align(display.BOTTOM_LEFT, 100, 0)
         :addTo(self)
 
-    self.hand_[self.hero2_.id] = HandCardRowView.new(self.hero2_)
+    self.hand_[self.hero2_.id] = HandCardRowView.new(self.hero2_, 'side.up')
         :align(display.BOTTOM_LEFT, 100, display.top - 110)
         :addTo(self)
 
     self.field_ = {}
-    self.field_[self.hero1_.id] = FieldCardRowView.new(self.hero1_)
+    self.field_[self.hero1_.id] = FieldCardRowView.new(self.hero1_, 'side.down')
         :align(display.BOTTOM_LEFT, 100, 150)
         :addTo(self)
 
-    self.field_[self.hero2_.id] = FieldCardRowView.new(self.hero1_)
+    self.field_[self.hero2_.id] = FieldCardRowView.new(self.hero1_, 'side.up')
         :align(display.BOTTOM_LEFT, 100, display.top - 150 - 170)
         :addTo(self)
 
     self.heros_ = {}
-    self.heros_[self.hero1_.id] = HeroView.new(self.hero1_)
+    self.heros_[self.hero1_.id] = HeroView.new(self.hero1_, 'side.down')
         :align(display.BOTTOM_LEFT, 50, 50)
         :addTo(self)
 
-    self.heros_[self.hero2_.id] = HeroView.new(self.hero2_)
+    self.heros_[self.hero2_.id] = HeroView.new(self.hero2_, 'side.up')
         :align(display.BOTTOM_LEFT, 50, display.top - 50)
         :addTo(self)
 
@@ -85,13 +85,17 @@ function BattleScene:ctor(hero1Info, hero2Info)
     self:registCmdHandle(Track.HERO_REMOVE_CARD_FROM_FIELD, self.onHeroRemoveCardFromField)
     self:registCmdHandle(Track.HERO_PROPERTY_CHANGE, self.onHeroPropertyChange)
     self:registCmdHandle(Track.CARD_CD_CHANGE, self.onCardCdChange)
-    self:registCmdHandle(Track.CARD_ATTACK_TO_CARD, self.onCardAttackToCard)
-    self:registCmdHandle(Track.CARD_ATTACK_TO_HERO, self.onCardAttackToHero)
+    self:registCmdHandle(Track.CARD_BEFORE_ATTACK_TO_CARD, self.onCardBeforeAttackToCard)
+    self:registCmdHandle(Track.CARD_AFTER_ATTACK_TO_CARD, self.onCardAfterAttackToCard)
+    self:registCmdHandle(Track.CARD_BEFORE_ATTACK_TO_HERO, self.onCardBeforeAttackToHero)
+    self:registCmdHandle(Track.CARD_AFTER_ATTACK_TO_HERO, self.onCardAfterAttackToHero)
     self:registCmdHandle(Track.CARD_PROPERTY_CHANGE, self.onCardPropertyChange)
     self:registCmdHandle(Track.CARD_ENTER, self.onCardEnter)
     self:registCmdHandle(Track.CARD_LEAVE, self.onCardLeave)
-    self:registCmdHandle(Track.CARD_SKILL_TRIGGER, self.onSkillTrigger)
+    self:registCmdHandle(Track.CARD_SKILL_TRIGGER_BEGIN, self.onSkillTriggerBegin)
+    self:registCmdHandle(Track.CARD_SKILL_TRIGGER_END, self.onSkillTriggerEnd)
     self:registCmdHandle(Track.ROUND_START, self.onRoundStart)
+    self:registCmdHandle(Track.CARD_ENCOUNTER_SKILL, self.onCardEncounterSkill)
 end
 
 function BattleScene:registCmdHandle(cmdType, handle)
@@ -105,7 +109,7 @@ function BattleScene:onHeroAddCardToHand(cmd)
             self.hand_[cmd.heroId]:addCard(cmd.cardId, cardTypeId)
 
             self:executeNextCmd()
-        end, 1)
+        end, 0.5)
 end
 
 function BattleScene:onHeroAddCardToField(cmd)
@@ -115,7 +119,7 @@ function BattleScene:onHeroAddCardToField(cmd)
             self.field_[cmd.heroId]:addCard(cmd.cardId, cardTypeId, cmd.cardLv, cmd.idx)
 
             self:executeNextCmd()
-        end, 1)
+        end, 0.5)
 end
 
 function BattleScene:onHeroRemoveCardFromHand(cmd)
@@ -124,7 +128,7 @@ function BattleScene:onHeroRemoveCardFromHand(cmd)
             self.hand_[cmd.heroId]:removeCard(cmd.cardId)
 
             self:executeNextCmd()
-        end, 1)
+        end, 0.5)
 end
 
 function BattleScene:onHeroRemoveCardFromField(cmd)
@@ -133,7 +137,7 @@ function BattleScene:onHeroRemoveCardFromField(cmd)
             self.field_[cmd.heroId]:removeCard(cmd.cardId, cmd.idx)
 
             self:executeNextCmd()
-        end, 1)
+        end, 0.5)
 end
 
 function BattleScene:onHeroPropertyChange(cmd)
@@ -161,28 +165,56 @@ function BattleScene:onCardCdChange(cmd)
     self:executeNextCmd()
 end
 
-function BattleScene:onCardAttackToCard(cmd)
+function BattleScene:onCardBeforeAttackToCard(cmd)
     local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
     if not card then
         -- TODO wtf
         return
     end
 
-    local time = card:attack()
+    local time = card:attackBegin()
     scheduler.performWithDelayGlobal(
         function()
             self:executeNextCmd()
         end, time)
 end
 
-function BattleScene:onCardAttackToHero(cmd)
+function BattleScene:onCardAfterAttackToCard(cmd)
     local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
     if not card then
         -- TODO wtf
         return
     end
 
-    local time = card:attack()
+    local time = card:attackEnd()
+    scheduler.performWithDelayGlobal(
+        function()
+            self:executeNextCmd()
+        end, time)
+end
+
+function BattleScene:onCardBeforeAttackToHero(cmd)
+    local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
+    if not card then
+        -- TODO wtf
+        return
+    end
+
+    local time = card:attackBegin()
+    scheduler.performWithDelayGlobal(
+        function()
+            self:executeNextCmd()
+        end, time)
+end
+
+function BattleScene:onCardAfterAttackToHero(cmd)
+    local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
+    if not card then
+        -- TODO wtf
+        return
+    end
+
+    local time = card:attackEnd()
     scheduler.performWithDelayGlobal(
         function()
             self:executeNextCmd()
@@ -190,21 +222,22 @@ function BattleScene:onCardAttackToHero(cmd)
 end
 
 function BattleScene:onCardPropertyChange(cmd)
+    local time = 0
+    local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
+    if card then
+        for k, v in pairs(cmd.property) do
+            if k == 'hp' then
+                time = card:setHp(v)
+            elseif k == 'atk' then
+                time = card:setAtk(v)
+            end
+        end
+    end
+
     scheduler.performWithDelayGlobal(
         function()
-            local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
-            if card then
-                for k, v in pairs(cmd.property) do
-                    if k == 'hp' then
-                        card:setHp(v)
-                    elseif k == 'atk' then
-                        card:setAtk(v)
-                    end
-                end
-            end
-
             self:executeNextCmd()
-        end, 1)
+        end, time)
 end
 
 function BattleScene:onCardEnter(cmd)
@@ -229,7 +262,7 @@ function BattleScene:onCardLeave(cmd)
     self:executeNextCmd()
 end
 
-function BattleScene:onSkillTrigger(cmd)
+function BattleScene:onSkillTriggerBegin(cmd)
     local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
     if not card then
         card = self.hand_[cmd.heroId]:getCard(cmd.cardId)
@@ -240,7 +273,25 @@ function BattleScene:onSkillTrigger(cmd)
         return
     end
 
-    local time = card:triggerSkill(cmd.skillId)
+    local time = card:skillTriggerBegin(cmd.skillId)
+    scheduler.performWithDelayGlobal(
+        function()
+            self:executeNextCmd()
+        end, time)
+end
+
+function BattleScene:onSkillTriggerEnd(cmd)
+    local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
+    if not card then
+        card = self.hand_[cmd.heroId]:getCard(cmd.cardId)
+    end
+
+    if not card then
+        -- TODO wtf
+        return
+    end
+
+    local time = card:skillTriggerEnd(cmd.skillId)
     scheduler.performWithDelayGlobal(
         function()
             self:executeNextCmd()
@@ -251,6 +302,24 @@ function BattleScene:onRoundStart(cmd)
     self.field_[self.hero1_.id]:reorder()
     self.field_[self.hero2_.id]:reorder()
     self:executeNextCmd()
+end
+
+function BattleScene:onCardEncounterSkill(cmd)
+    local card = self.field_[cmd.heroId]:getCard(cmd.cardId)
+    if not card then
+        card = self.hand_[cmd.heroId]:getCard(cmd.cardId)
+    end
+
+    if not card then
+        -- TODO wtf
+        return
+    end
+
+    local time = card:encounterSkill(cmd.skillId)
+    scheduler.performWithDelayGlobal(
+        function()
+            self:executeNextCmd()
+        end, time)
 end
 
 function BattleScene:executeNextCmd()

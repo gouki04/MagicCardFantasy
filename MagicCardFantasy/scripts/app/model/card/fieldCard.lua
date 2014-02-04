@@ -17,6 +17,9 @@ function FieldCard:ctor(properties)
 	if self.cardId_ ~= nil and self.lv_ ~= nil then
 		self:init(self.cardId_, self.lv_)
 	end
+
+    self.buff_ = {}
+    self.toRemoveBuff_ = {}
 end
 
 function FieldCard:init(id, lv)
@@ -29,6 +32,19 @@ function FieldCard:init(id, lv)
 	self.cd_ = self.info_.cd
 
 	self:initSkill()
+end
+
+function FieldCard:addBuff(buff)
+    buff:setCard(self)
+    table.insert(self.buff_, buff)
+
+    self:dispatchEvent({name = Card.ADD_BUFF_EVENT, card = self, buff = buff})
+end
+
+function FieldCard:removeBuff(buff)
+    table.insert(self.toRemoveBuff_, buff)
+
+    self:dispatchEvent({name = Card.REMOVE_BUFF_EVENT, card = self, buff = buff})
 end
 
 function FieldCard:atk()
@@ -69,6 +85,39 @@ function FieldCard:hp()
 	return self.hp_
 end
 
+function FieldCard:checkCanEnter(defend, dcard)
+	for _, buff in pairs(self.buff_) do
+		if not buff:canEnter() then
+			return false
+		end
+	end
+
+	return true
+end
+
+function FieldCard:checkCanAttack()
+	for _, buff in pairs(self.buff_) do
+		if not buff:canAttack() then
+			return false
+		end
+	end
+
+	return true
+end
+
+function FieldCard:beforeEnter(defend, dcard)
+	for _, v in pairs(self.toRemoveBuff_) do
+		self:removeBuff(v)
+	end
+	self.toRemoveBuff_ = {}
+
+	if not self:checkCanEnter() then
+		return false
+	end
+
+	return true
+end
+
 function FieldCard:enter(defend, dcard)
 	self:dispatchEvent({name = Card.ENTER_EVENT, card = self})
 	
@@ -86,7 +135,11 @@ function FieldCard:leave()
 end
 
 function FieldCard:attackCard(card)
-	self:dispatchEvent({name = Card.BEFORE_ATTACK_TO_CARD_EVENT, card = self, target = card})
+	if not self:checkCanEnter() then
+		return
+	end
+
+	self:dispatchEvent({name = Card.BEFORE_ATTACK_TO_CARD_EVENT, card = self, targetCard = card})
 
 	local dam = Damage.new({
 			type = Damage.eType.Physical,
@@ -98,14 +151,18 @@ function FieldCard:attackCard(card)
 	
 	dam = card:damage(dam)
 	if dam > 0 then
-		self:dispatchEvent({name = Card.COST_PHYSICAL_DAM_TO_CARD_EVENT, card = self, target = card, damage = dam})
+		self:dispatchEvent({name = Card.COST_PHYSICAL_DAM_TO_CARD_EVENT, card = self, targetCard = card, damage = dam})
 	end
 
-	self:dispatchEvent({name = Card.AFTER_ATTACK_TO_CARD_EVENT, card = self, target = card})
+	self:dispatchEvent({name = Card.AFTER_ATTACK_TO_CARD_EVENT, card = self, targetCard = card})
 end
 
 function FieldCard:attackHero(hero)
-	self:dispatchEvent({name = Card.BEFORE_ATTACK_TO_HERO_EVENT, card = self, target = hero})
+	if not self:checkCanEnter() then
+		return
+	end
+	
+	self:dispatchEvent({name = Card.BEFORE_ATTACK_TO_HERO_EVENT, card = self, targetCard = hero})
 
 	local dam = Damage.new({
 			type = Damage.eType.Physical,
@@ -117,10 +174,10 @@ function FieldCard:attackHero(hero)
 	
 	dam = hero:damage(dam)
 	if dam > 0 then
-		self:dispatchEvent({name = Card.COST_PHYSICAL_DAM_TO_HERO_EVENT, card = self, target = hero, damage = dam})
+		self:dispatchEvent({name = Card.COST_PHYSICAL_DAM_TO_HERO_EVENT, card = self, targetCard = hero, damage = dam})
 	end
 
-	self:dispatchEvent({name = Card.AFTER_ATTACK_TO_HERO_EVENT, card = self, target = hero})
+	self:dispatchEvent({name = Card.AFTER_ATTACK_TO_HERO_EVENT, card = self, targetCard = hero})
 end
 
 function FieldCard:damage(dam)
@@ -136,6 +193,20 @@ function FieldCard:damage(dam)
 	self:dispatchEvent({name = Card.AFTER_DAM_EVENT, card = self, damage = dam})
 
 	return dam:value()
+end
+
+function FieldCard:encounterSkill(skill, dam, buffs)
+	self:dispatchEvent({name = Card.ENCOUNTER_SKILL_EVENT, card = self, skill = skill})
+
+	if dam then
+		self:damage(dam)
+	end
+
+	if buffs then
+		for _, v in pairs(buffs) do
+			self:addBuff(v)
+		end
+	end
 end
 
 return FieldCard

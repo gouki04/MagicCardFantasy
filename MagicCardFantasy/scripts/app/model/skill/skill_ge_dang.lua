@@ -15,6 +15,12 @@ function Skill_ge_dang:ctor(properties)
 	self.name_ = '格挡'
 end
 
+function Skill_ge_dang:destroy()
+	if self.card_ then
+		self.card_:removeEventListener(Card.BEFORE_DAM_EVENT, self.onBeforePhysicalDamage, self)
+	end
+end
+
 function Skill_ge_dang:onBeforePhysicalDamage(evt)
 	local card = evt.card
 	local dam = evt.damage
@@ -22,6 +28,8 @@ function Skill_ge_dang:onBeforePhysicalDamage(evt)
 	if dam:type() == Damage.eType.Physical then
 		self:triggerBegin()
 
+		self.card_:encounterSkill(self)
+		
 		local value = dam:value() - 20 * self:lv()
 		if value < 0 then
 			value = 0
@@ -39,7 +47,9 @@ end
 function Skill_ge_dang:setCard(card)
 	self.card_ = card
 
-	self.card_:addEventListener(Card.BEFORE_DAM_EVENT, self.onBeforePhysicalDamage, self)
+	if self.card_ then
+		self.card_:addEventListener(Card.BEFORE_DAM_EVENT, self.onBeforePhysicalDamage, self)
+	end
 end
 
 return Skill_ge_dang

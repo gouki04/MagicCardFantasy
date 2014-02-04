@@ -3,7 +3,8 @@
 ]]
 local Skill = class('Skill', cc.mvc.ModelBase)
 
-Skill.TRIGGER_EVENT = "TRIGGER_EVENT"
+Skill.TRIGGER_BEGIN_EVENT = "TRIGGER_BEGIN_EVENT"
+Skill.TRIGGER_END_EVENT   = "TRIGGER_END_EVENT"
 
 function Skill:ctor(properties)
 	Skill.super.ctor(self, properties)
@@ -12,6 +13,10 @@ end
 function Skill:init(id, lv)
 	self.id_ = id
 	self.lv_= lv
+end
+
+function Skill:destroy()
+    
 end
 
 function Skill:name()
@@ -53,22 +58,35 @@ function Skill:id()
 end
 
 function Skill:triggerBegin()
-    self:dispatchEvent({name = Skill.TRIGGER_EVENT, skill = self})
+    self:dispatchEvent({name = Skill.TRIGGER_BEGIN_EVENT, skill = self})
 end
 
 function Skill:triggerEnd()
+    self:dispatchEvent({name = Skill.TRIGGER_END_EVENT, skill = self})
 end
 
-function Skill:toDeck(hero, card)
+function Skill:enterDeck(hero, card)
 end
 
-function Skill:toHand(hero, card)
+function Skill:leaveDeck(hero, card)
 end
 
-function Skill:toField(hero, card)
+function Skill:enterHand(hero, card)
 end
 
-function Skill:toGrave(hero, card)
+function Skill:leaveHand(hero, card)
+end
+
+function Skill:enterField(hero, card)
+end
+
+function Skill:leaveField(hero, card)
+end
+
+function Skill:enterGrave(hero, card)
+end
+
+function Skill:leaveGrave(hero, card)
 end
 
 return Skill

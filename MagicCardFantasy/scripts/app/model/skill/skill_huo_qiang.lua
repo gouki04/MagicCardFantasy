@@ -51,13 +51,14 @@ function Skill_huo_qiang:enter(defend, dcard)
 
 		local dam = Damage.new({
 				type = Damage.eType.Magical,
+				subType = Damage.eSubType.Fire,
 				value = value,
 			})
 
 		Log.write(string.format('[skill][%s%i] fire damage %i --> [card][%s%i]', 
 			self:name(), self:lv(), value, card:name(), card:lv()))
 
-		card:damage(dam)
+		card:encounterSkill(self, dam)
 	end
 	self:triggerEnd()
 end
